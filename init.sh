@@ -17,9 +17,6 @@ log "WORK_DIR: ${WORK_DIR}";
   for f in $(find "$SCRIPT_DIR" -type f -name "*.sh"); do
     [[ "${f##*/}" == "config.sh" ]] && [[ -f "${WORK_DIR}/${CONFIG_FILE}" ]] ||
     cp "$f" "$WORK_DIR";
-#    cp "$f" "$WORK_DIR" ||
-#    cp "$f" "$WORK_DIR";
-#    echo "file: ${f##*/}";
   done
   log "work dir files:";
   ls -la "$WORK_DIR";

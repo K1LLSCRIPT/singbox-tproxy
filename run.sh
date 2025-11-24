@@ -24,3 +24,4 @@ rm -rf "${GIT_DIR}/${REPO##*/}";
 mkdir -p "${GIT_DIR}/${REPO##*/}";
 
 git clone "$REPO" "${GIT_DIR}/${REPO##*/}";
+exec "${GIT_DIR}/${REPO##*/}/init.sh";
