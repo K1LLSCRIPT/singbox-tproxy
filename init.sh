@@ -13,6 +13,7 @@ log "SCRIPT_DIR: ${SCRIPT_DIR##*/}";
 log "WORK_DIR: ${WORK_DIR}";
 
 [[ "$SCRIPT_DIR" != "$WORK_DIR" ]] && {
+  log "copy files";
   mkdir -p "$WORK_DIR";
   for f in $(find "$SCRIPT_DIR" -type f -name "*.sh"); do
     [[ "${f##*/}" == "config.sh" ]] &&
