@@ -15,9 +15,13 @@ log "WORK_DIR: ${WORK_DIR}";
 [[ "$SCRIPT_DIR" != "$WORK_DIR" ]] && {
   mkdir -p "$WORK_DIR";
   for f in $(find "$SCRIPT_DIR" -type f -name "*.sh"); do
-    [[ "${f##*/}" == "config.sh" ]] && [[ -f "${WORK_DIR}/${CONFIG_FILE}" ]] ||
+    [[ "${f##*/}" == "config.sh" ]] &&
+    [[ -f "${WORK_DIR}/${CONFIG_FILE}" ]] ||
     cp "$f" "$WORK_DIR";
   done
-  log "work dir files:";
-  ls -la "$WORK_DIR";
+  echo;
+  exec "${WORK_DIR}/init.sh" "$@";
 }
+
+log "SCRIPT_DIR: ${SCRIPT_DIR##*/}";
+log "WORK_DIR: ${WORK_DIR}";
