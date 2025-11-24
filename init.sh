@@ -19,9 +19,24 @@ source <(cat "${SCRIPT_DIR}/log.sh");
     [[ -f "${WORK_DIR}/${CONFIG_FILE}" ]] ||
     cp "$f" "$WORK_DIR";
   done
-  echo;
   exec "${WORK_DIR}/init.sh" "$@";
 }
 
+echo;
+log "running";
 log "SCRIPT_DIR: ${SCRIPT_DIR}";
 log "WORK_DIR: ${WORK_DIR}";
+
+USER_ARGS=(
+  SUBSCRIPTION_URL
+  EXTERNAL_UI_SECRET
+  INBOUNDS_CONFIG_URL
+);
+
+check_user_args(){
+  for a in "${USER_ARGS[@]}"; do
+    (( $a )) || { read -p "Please provide ${a}" $a }
+  done
+}
+
+check_user_args;
