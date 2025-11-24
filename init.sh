@@ -9,7 +9,7 @@ WORK_DIR="${WORK_DIR}/${SCRIPT_DIR##*/}";
 source <(cat "${SCRIPT_DIR}/${CONFIG_FILE}");
 source <(cat "${SCRIPT_DIR}/log.sh");
 
-log "SCRIPT_DIR: ${SCRIPT_DIR##*/}";
+log "SCRIPT_DIR: ${SCRIPT_DIR}";
 log "WORK_DIR: ${WORK_DIR}";
 
 [[ "$SCRIPT_DIR" != "$WORK_DIR" ]] && {
@@ -24,5 +24,5 @@ log "WORK_DIR: ${WORK_DIR}";
   exec "${WORK_DIR}/init.sh" "$@";
 }
 
-log "SCRIPT_DIR: ${SCRIPT_DIR##*/}";
+log "SCRIPT_DIR: ${SCRIPT_DIR}";
 log "WORK_DIR: ${WORK_DIR}";
