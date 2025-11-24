@@ -36,7 +36,7 @@ USER_ARGS=(
 check_user_args(){
   for a in "${USER_ARGS[@]}"; do
     (( $a )) || {
-      read -p "Please provide ${a}" $a;
+      read -p "Please provide ${a}: " $a;
     }
   done
 }
