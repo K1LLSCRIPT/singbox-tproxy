@@ -78,14 +78,25 @@ get_url() {
   echo "$url";
 }
 
+unpack_file() {
+  local \
+    file="${1}" \
+    name="${2}";
+  [[ -f "$file" ]] && {
+    mkdir -p "${TMP_DIR}/${name}";
+    tar -xzf "$file" -C "${TMP_DIR}/${name}";
+  }
+}
+
 download() {
-  local url=$(get_url);
-  log "download: ${url}";
+  local \
+    file \
+    name="sing-box" \
+    url=$(get_url);
   curl -LJOs --output-dir "$TMP_DIR" "$url";
-  echo $(find $TMP_DIR -type f -name sing*);
+  file=$(find $TMP_DIR -type f -name sing*);
+  unpack_file "$file" "$name";
 }
 
 (( $SINGBOX_EXTENDED )) && download
-
-#          tar -xzf
 
