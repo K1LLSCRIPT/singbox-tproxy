@@ -36,9 +36,12 @@ USER_ARGS=(
 check_user_args(){
   for a in "${USER_ARGS[@]}"; do
     (( $a )) || {
-      read -p "Please provide ${a}: " $a;
+      local v="$a";
+      read -p "Please provide ${v}: " $v;
+      sed -i -E "s/(${a})(.*)/\1=\'${v}\'/" "${WORK_DIR}/${CONFIG_FILE}";
     }
   done
+  [[ ! -z "$v" ]] && source <(cat "${SCRIPT_DIR}/${CONFIG_FILE}") || log "all args are set.";
 }
 
 check_user_args;
