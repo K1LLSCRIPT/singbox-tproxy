@@ -83,8 +83,9 @@ unpack_file() {
     file="${1}" \
     name="${2}";
   [[ -f "$file" ]] && {
-    mkdir -p "${TMP_DIR}/${name}";
-    tar -xzf "$file" -C "${TMP_DIR}/${name}";
+  #  mkdir -p "${TMP_DIR}/${name}";
+  #  tar -xzf "$file" -C "${TMP_DIR}/${name}";
+    tar -xzf "$file" -C "${TMP_DIR}";
   }
 }
 
