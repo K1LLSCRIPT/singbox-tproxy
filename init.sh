@@ -374,7 +374,6 @@ configure_sing_box() {
   cp "$config_path" "$backup_dir";
   cp "${TMP_DIR}/config.json" "$config_path";
 
-
   mkdir -p /var/spool/cron/crontabs;
   touch /etc/crontabs/root;
 
@@ -406,6 +405,10 @@ restart_service(){
   service "$program" restart;
 }
 
+post_install() {
+  log "ZBS!! Installation completed successfully :)";
+}
+
 main() {
   prepare;
   check_deps || { error "Failed to install packages"; exit 1; }
@@ -421,6 +424,7 @@ main() {
   restart_service "firewall"
   prog_control "sing-box" stop;
   prog_control "sing-box" start;
+  post_install;
 }
 
 main;
