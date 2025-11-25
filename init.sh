@@ -373,6 +373,13 @@ configure_sing_box() {
   curl "$url" -L -o "${TMP_DIR}/config.json";
   cp "$config_path" "$backup_dir";
   cp "${TMP_DIR}/config.json" "$config_path";
+
+  crontab -l > /tmp/my_crontab_temp;
+  cat /tmp/my_crontab_temp | grep checker || {
+    echo "*/1 * * * * ${WORK_DIR}/checker.sh" >> /tmp/my_crontab_temp;
+    crontab /tmp/my_crontab_temp;
+  }
+  rm /tmp/my_crontab_temp;
 }
 
 prog_control() {
