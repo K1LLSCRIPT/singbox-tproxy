@@ -173,7 +173,7 @@ configure_dhcp() {
 
   for (( i=0; i<$c; i++ )); do
     for p in "${dhcp_params[@]}"; do
-      echo "dhcp_param ${c}: ${p}";
+      echo "dhcp_param ${i}: ${p}";
     done
   done
 
