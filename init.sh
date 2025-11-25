@@ -104,16 +104,10 @@ unpack_file() {
     name="$2";
   sleep 1;
   local dir=$(find "$WORK_DIR" -type d -name "${name}*");
-  [[ -d "$dir" ]] && rm -rf "$dir";
+  [[ -d "$dir" ]] && rm -rf "$dir" && sleep 1;
   [[ -f "$file" ]] && {
-    
-    #[[ -d "$dir" ]] && 
-        log  "zaeblo";
-    #rm -rf "${dir}";
-    tar -xzf "$file" -C "$WORK_DIR";
-    #local bin=$(find "$WORK_DIR" -type f -name "$name" -exec test -x {} \; -print);
-    #echo "$bin";
-    sleep 5;
+    tar -xzf "$file" -C "$WORK_DIR"; sleep 5;
+    echo $(find "$WORK_DIR" -type f -name "$name" -exec test -x {} \; -print);
   } || { log "File not found: ${file}"; exit 1; }
 }
 # WORK_DIR="/root/singbox-tproxy"; name="sing-box"; echo $(find "$WORK_DIR" -type f -name "${name}" -exec test -x {} \; -print);
@@ -202,12 +196,12 @@ get_file() {
   url=$(get_url "$name");
   download "${url##*/}" "$url" && {
     file=$(find "$WORK_DIR" -type f -name "${name}*");
-    log "File path0: ${file}";
-    #file=$(unpack_file "$file" "$name");
-    unpack_file "$file" "$name";
-    file=$(find "$WORK_DIR" -type f -name "$name" -exec test -x {} \; -print);
+    #log "File path0: ${file}";
+    file=$(unpack_file "$file" "$name");
+    #unpack_file "$file" "$name";
+    #file=$(find "$WORK_DIR" -type f -name "$name" -exec test -x {} \; -print);
   #  log "Downloading ${name} done.";
-    log "File path: ${file}";
+  #  log "File path: ${file}";
     copy_file "$file" "$name";
   } || { log "Get file: ${name} FAILED. Exiting."; exit 1; }
 }
