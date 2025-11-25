@@ -109,7 +109,7 @@ unpack_file() {
         log  "zaeblo";
     rm -rf "${dir}";
     tar -xzf "$file" -C "$WORK_DIR";
-    local bin=$(find "$WORK_DIR" -type f -name "${name}" -exec test -x {} \; -print);
+    local bin=$(find "$WORK_DIR" -type f -name "$name" -exec test -x {} \; -print);
     echo "$bin";
   } || { log "File not found: ${file}"; exit 1; }
 }
