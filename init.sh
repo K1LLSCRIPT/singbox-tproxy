@@ -378,9 +378,9 @@ configure_sing_box() {
   mkdir -p /var/spool/cron/crontabs;
   touch /etc/crontabs/root;
 
-  grep -qF "${WORK_DIR}/checker.sh" /etc/crontabs/root || {
-    echo "*/1 * * * * ${WORK_DIR}/checker.sh" >> /etc/crontabs/root;
-    /etc/init.d/cron reload
+  grep -qF "/root/singbox-tproxy/checker.sh" /etc/crontabs/root || {
+    echo '*/1 * * * * /root/singbox-tproxy/checker.sh' >> /etc/crontabs/root;
+    /etc/init.d/cron reload;
   }
 }
 
