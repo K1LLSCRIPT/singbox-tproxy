@@ -106,8 +106,8 @@ unpack_file() {
   [[ -d "$dir" ]] && rm -rf "$dir" && sleep 1;
   [[ -f "$file" ]] && {
     tar -xzf "$file" -C "$WORK_DIR"; sleep 5;
-  #  echo $(find "$WORK_DIR" -type f -name "$name" -exec test -x {} \; -print);
-  } || { log "File not found: ${file}"; exit 1; }
+    echo $(find "$WORK_DIR" -type f -name "$name" -exec test -x {} \; -print);
+  } || { error "File not found: ${file}"; exit 1; }
 }
 
 copy_file() {
@@ -119,7 +119,7 @@ copy_file() {
   [[ -f "$file" ]] && {
     log "Copy file: ${file} to: ${dest}";
     cp "$file" "$dest";
-  } || { log "Copy file: ${name} FAILED"; exit 1; }
+  } || { error "Copy file: ${name} FAILED"; exit 1; }
 }
 
 download_yy() {
@@ -140,10 +140,10 @@ download_yy() {
 check_file() {
   local file="$1";
 
-  [[ ! -s "$file" ]] && { log "FILE ${file##*/} error"; return 1; }
+  [[ ! -s "$file" ]] && { error "FILE ${file##*/} error"; return 1; }
   [[ "$file" == *.gz ]] && {
     gzip -t "$file" 2>/dev/null ||
-    { log "FILE ${file##*/} is fucked .gz"; return 1; }
+    { error "FILE ${file##*/} is fucked .gz"; return 1; }
   }
   return 0;
 }
@@ -180,13 +180,13 @@ download() {
       log "File: ${file} downloaded and passed checks.";
       return 0;
     } || {
-      log "File: ${file} failed check, retrying...";
+      error "File: ${file} failed check, retrying...";
       rm -f "$file";
       ((count++));
       sleep 5;
     }
   done;
-  log "Failed to download ${file} after ${retries} attempts";
+  error "Failed to download ${file} after ${retries} attempts";
   return 1;
 }
 
@@ -204,7 +204,7 @@ get_file() {
   #  log "Downloading ${name} done.";
   #  log "File path: ${file}";
     copy_file "$file" "$name";
-  } || { log "Get file: ${name} FAILED. Exiting."; exit 1; }
+  } || { error "Get file: ${name} FAILED. Exiting."; exit 1; }
 }
 
 # https://github.com/shtorm-7/sing-box-extended/releases/download/v1.12.12-extended-1.4.2/sing-box-1.12.12-extended-1.4.2-linux-arm64.tar.gz
