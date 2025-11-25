@@ -37,7 +37,7 @@ deps=(
 check_deps() {
   local nopkg=();
   for pkg in "${deps[@]}"; do
-    opkg list-installed | grep -qo "$pkg" || nopkg+=("${pkg}");
+    opkg list-installed | grep -Eqo "^${pkg}" || nopkg+=("${pkg}");
   #  [[ ! -x "$(command -v $pkg)" ]] && nopkg+=("${pkg}");
   done;
   (( "${#nopkg[@]}" )) && {
