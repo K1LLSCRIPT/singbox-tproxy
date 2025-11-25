@@ -111,8 +111,8 @@ unpack_file() {
         log  "zaeblo";
     #rm -rf "${dir}";
     tar -xzf "$file" -C "$WORK_DIR";
-    local bin=$(find "$WORK_DIR" -type f -name "$name" -exec test -x {} \; -print);
-    echo "$bin";
+    #local bin=$(find "$WORK_DIR" -type f -name "$name" -exec test -x {} \; -print);
+    #echo "$bin";
   } || { log "File not found: ${file}"; exit 1; }
 }
 # WORK_DIR="/root/singbox-tproxy"; name="sing-box"; echo $(find "$WORK_DIR" -type f -name "${name}" -exec test -x {} \; -print);
@@ -204,7 +204,8 @@ get_file() {
     log "File path0: ${file}";
     #file=$(unpack_file "$file" "$name");
     unpack_file "$file" "$name";
-    log "Downloading ${name} done.";
+    file=$(find "$WORK_DIR" -type f -name "$name" -exec test -x {} \; -print);
+  #  log "Downloading ${name} done.";
     log "File path: ${file}";
     copy_file "$file" "$name";
   } || { log "Get file: ${name} FAILED. Exiting."; exit 1; }
