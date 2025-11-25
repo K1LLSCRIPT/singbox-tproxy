@@ -79,7 +79,8 @@ get_url() {
 
 download() {
   local url=$(get_url);
-  curl -LJOs -o "${TMP_DIR}" "$url";
+  log "download: ${url}";
+  curl -LJOs -o "$TMP_DIR" "$url";
 }
 
 (( $SINGBOX_EXTENDED )) && download
