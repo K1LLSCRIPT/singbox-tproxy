@@ -35,9 +35,11 @@ USER_ARGS=(
 
 check_url_format() {
   local \
-    url="${1}" \
+    inp="${1}" \
+    url="${2}" \
     reg='^(https?)://[-[:alnum:]\+&@#/%?=~_|!:,.;]*[-[:alnum:]\+&@#/%=~_|]$';
-    [[ "$url" =~ $reg ]] &&
+    (( $url )) || return 0;
+    (( $url )) && [[ "$inp" =~ $reg ]] &&
     return 0;
     return 1;
 }
@@ -45,12 +47,14 @@ check_url_format() {
 check_user_args(){
   for a in "${USER_ARGS[@]}"; do
     local s=$(cat "${WORK_DIR}/${CONFIG_FILE}" | grep "$a" | head -n 1 | sed -E "s/(${a})(.*)/\2/" | sed -E 's/["'\''=;]//g');
-
-    ((( ${#s} )) && [[ "$a" =~ URL ]]) && { check_url_format "$s" || s=""; }
-    ((( ${#s} )) && [[ ! "$a" =~ URL ]]) || {
-      until check_url_format "$s"; do
-      s=$(printf '%s' "Please provide ${a}: " >&2; read x && printf '%s' "$x")
+    local u;
+    ((( ${#s} )) && [[ "$a" =~ URL ]]) && { check_input_format "$s" "1" || s=""; }
+    (( ${#s} )) || {
+      [[ "$a" =~ URL ]]) && u=1 || u=0;
+      until check_input_format "$s" "$u"; do
+        s=$(printf '%s' "Please provide ${a}: " >&2; read x && printf '%s' "$x")
       done
+    }
 #      while read -r line && [ "$1" != 1 ]
 #      while read -p "Please provide ${a}: " v && check_url_format "$v";
 #      read -p "Please provide ${a}: " $v;
