@@ -17,7 +17,7 @@ source <(cat "${SCRIPT_DIR}/log.sh");
     [[ -f "${WORK_DIR}/${CONFIG_FILE}" ]] ||
     { cp "$f" "$WORK_DIR"; log "Copy file: ${f} to: ${WORK_DIR}"; }
   done
-  exec "${WORK_DIR}/init.sh" "$@";
+  echo; exec "${WORK_DIR}/init.sh" "$@";
 }
 
 prepare() {
@@ -351,7 +351,7 @@ configure_nftables() {
 
     rm -rf "${GIT_DIR}/${repo_voice##*/}";
     mkdir -p "${GIT_DIR}/${repo_voice##*/}";
-    git clone "$repo_voice" "${GIT_DIR}/${repo_voice##*/}";
+    git clone -q "$repo_voice" "${GIT_DIR}/${repo_voice##*/}";
     file_voice="$(find ${GIT_DIR}/${repo_voice##*/} -name *.list)";
     log "FILE VOICE: $file_voice";
     echo -n > "${WORK_DIR}/${file_nft_out}";
