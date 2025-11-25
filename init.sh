@@ -12,12 +12,12 @@ source <(cat "${SCRIPT_DIR}/log.sh");
 
 [[ "$SCRIPT_DIR" != "$WORK_DIR" ]] && {
   echo; mkdir -p "$WORK_DIR";
-  log "Executing bootstrap...";
   for f in $(find "$SCRIPT_DIR" -type f -name "*.sh"); do
     [[ "${f##*/}" == "config.sh" ]] &&
     [[ -f "${WORK_DIR}/${CONFIG_FILE}" ]] ||
     { cp "$f" "$WORK_DIR"; log "Copy file: ${f} to: ${WORK_DIR}"; }
   done
+  log "Executing bootstrap...";
   exec "${WORK_DIR}/init.sh" "$@";
 }
 
