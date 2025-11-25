@@ -82,7 +82,8 @@ check_user_args(){
         e=${s//\\/\\\\}; e=${e//&/\\&}; e=${e//\//\\/};
 
         cat "${WORK_DIR}/${CONFIG_FILE}" | grep "$a" >/dev/null ||
-        echo "$a" >> "${WORK_DIR}/${CONFIG_FILE}";
+        sed -i "/^###################/ i$a" "${WORK_DIR}/${CONFIG_FILE}";
+        #echo "$a" >> "${WORK_DIR}/${CONFIG_FILE}";
         sed -i -E \
           "1,/^###################/ s#^[[:space:]]*(${a})[[:space:]]*=.*#\1='${e}';#" \
           "${WORK_DIR}/${CONFIG_FILE}";
