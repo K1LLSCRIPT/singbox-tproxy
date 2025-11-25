@@ -103,9 +103,10 @@ unpack_file() {
     file="$1" \
     name="$2";
 
+  local dir=$(find "$WORK_DIR" -type d -name "${name}*");
   [[ -d "$dir" ]] &&  log  "zaeblo";
   [[ -f "$file" ]] && {
-    local dir=$(find "$WORK_DIR" -type d -name "${name}*");
+    
     #[[ -d "$dir" ]] && 
         log  "zaeblo";
     #rm -rf "${dir}";
