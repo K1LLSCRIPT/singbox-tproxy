@@ -39,25 +39,39 @@ check_input() {
     url="${2}" \
     reg='^(https?)://[-[:alnum:]\+&@#/%?=~_|!:,.;]*[-[:alnum:]\+&@#/%=~_|]$';
 
-    (( ${#inp} )) && [[ ! "$inp" =~ $reg ]] && return 0;
-    (( $url )) && [[ "$inp" =~ $reg ]] && return 0;
+    (( $url )) && {
+      [[ "$inp" =~ $reg ]] && return 0;
+    } || {
+      (( ${#inp} )) && [[ ! "$inp" =~ $reg ]] && return 0;
+    }
     return 1;
 }
 
 check_user_args(){
   for a in "${USER_ARGS[@]}"; do
-    local s=$(cat "${WORK_DIR}/${CONFIG_FILE}" | grep "$a" | head -n 1 | sed -E "s/(${a})(.*)/\2/" | sed -E 's/["'\''=;]//g');
-    local u;
+
+#    local s=$(cat "${WORK_DIR}/${CONFIG_FILE}" | grep "$a" | head -n 1 | sed -E "s/(${a})(.*)/\2/" | sed -E 's/["'\''=;]//g');
+    local s u e;
+
+    s=$(
+      sed -nE \
+        "s/^[[:space:]]*${a}[[:space:]]*=[[:space:]]*['\"]?([^'\";]*)['\"]?;?.*/\1/p" \
+        "${WORK_DIR}/${CONFIG_FILE}"
+    );
+
     [[ "$a" =~ URL ]] && u=1 || u=0;
     (( ${#s} )) && { check_input "$s" "$u" || s=""; }
     (( ${#s} )) || {
       until (check_input "$s" "$u"); do
         s=$(printf '%s' "Please provide ${a}: " >&2; read x && printf '%s' "$x");
-        sed -i -E "s/(${a})(.*)/\1=\'${s}\'/" "${WORK_DIR}/${CONFIG_FILE}";
+        e=${s//\\/\\\\}; e=${e//&/\\&}; e=${e//\//\\/};
+
+        sed -i -E \
+          "1,/^###################/ s#^[[:space:]]*(${a})[[:space:]]*=.*#\1='${e}';#" \
+          "${WORK_DIR}/${CONFIG_FILE}";
       done
     }
   done
-#  [[ ! -z "$v" ]] && source <(cat "${SCRIPT_DIR}/${CONFIG_FILE}") || log "all args are set.";
 }
 
 check_user_args;
@@ -65,4 +79,5 @@ check_user_args;
 #      while read -r line && [ "$1" != 1 ]
 #      while read -p "Please provide ${a}: " v && check_url_format "$v";
 #      read -p "Please provide ${a}: " $v;
-#      sed -i -E "s/(${a})(.*)/\1=\'${v}\'/" "${WORK_DIR}/${CONFIG_FILE}";
+#      sed -i -E "s/(${a})(.*)/\1=\'${v}\'/" "${WORK_DIR}/${CONFIG_FILE}"
+#  [[ ! -z "$v" ]] && source <(cat "${SCRIPT_DIR}/${CONFIG_FILE}") || log "all args are set.";
