@@ -155,7 +155,8 @@ download() {
     url="$2" \
     retries=10 \
     count=0;
-  file="${WORK_DIR}/sing-box.tar.gz";
+  cd "$WORK_DIR";
+  file="sing-box.tar.gz";
   #echo "$url";
   #url='https://github.com/shtorm-7/sing-box-extended/releases/download/v1.12.12-extended-1.4.2/sing-box-1.12.12-extended-1.4.2-linux-arm64.tar.gz';
   while (( count < retries )); do
