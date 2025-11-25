@@ -70,6 +70,7 @@ check_input() {
 
 check_user_args(){
   echo; log "Checking user settings.";
+  (( $SINGBOX_EXTENDED )) && USER_ARGS+=("EXTENDED_TEMPLATE_URL");
   for a in "${USER_ARGS[@]}"; do
     local s u e;
     s=$(cat "${WORK_DIR}/${CONFIG_FILE}" | grep "$a" | head -n 1 | sed -E "s/(${a})(.*)/\2/" | sed -E 's/["'\''=;]//g');
@@ -80,6 +81,8 @@ check_user_args(){
         s=$(printf '%s' "Please provide ${a}: " >&2; read x && printf '%s' "$x");
         e=${s//\\/\\\\}; e=${e//&/\\&}; e=${e//\//\\/};
 
+        cat "${WORK_DIR}/${CONFIG_FILE}" | grep "$a" >/dev/null ||
+        echo "$a" >> "${WORK_DIR}/${CONFIG_FILE}";
         sed -i -E \
           "1,/^###################/ s#^[[:space:]]*(${a})[[:space:]]*=.*#\1='${e}';#" \
           "${WORK_DIR}/${CONFIG_FILE}";
@@ -123,20 +126,6 @@ copy_file() {
     log "Copy file: ${file} to: ${dest}";
     cp "$file" "$dest";
   } || { error "Copy file: ${name} FAILED"; exit 1; }
-}
-
-download_yy() {
-  local  url  file \
-    name="sing-box";
-  url=$(get_url);
-  [[ ! -f "${WORK_DIR}/${url##*/}" ]] && {
-    log "Downloading ${name}...";
-    curl -LJOs --output-dir "$WORK_DIR" "$url";
-  }
-  file=$(find "$WORK_DIR" -type f -name "${name}*");
-  file=$(unpack_file "$file" "$name");
-  log "Downloading ${name} done.";
-  copy_file "$file" "$name";
 }
 
 check_file() {
@@ -355,6 +344,12 @@ configure_nftables() {
     echo -n > "${WORK_DIR}/${file_nft_out}";
     make_nft_file "${WORK_DIR}/${file_nft}" "${WORK_DIR}/${file_nft_out}" "$file_voice";
     cp "${WORK_DIR}/${file_nft_out}" "$config_path";
+}
+
+configure_sing_box() {
+  local \
+    config_path=$(uci -q get sing-box.main.conffile);
+
 }
 
 prog_control() {
