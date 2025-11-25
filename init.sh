@@ -155,7 +155,7 @@ download() {
     url="$2" \
     retries=10 \
     count=0;
-
+  echo "$url";
   while (( count < retries )); do
     [[ ! -f "${WORK_DIR}/${file}" ]] &&
       log "Downloading: ${file}" && {
