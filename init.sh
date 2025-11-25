@@ -100,10 +100,8 @@ unpack_file() {
     file="${1}" \
     name="${2}";
   [[ -f "$file" ]] && {
-  #  mkdir -p "${TMP_DIR}/${name}";
-  #  tar -xzf "$file" -C "${TMP_DIR}/${name}";
     tar -xzf "$file" -C "${TMP_DIR}";
-#    echo $(find $TMP_DIR -type f -name ${name}* -exec test -x {} \; -print);
+    echo $(find $TMP_DIR -type f -name ${name} -exec test -x {} \; -print);
   }
 }
 
@@ -115,11 +113,9 @@ download() {
   log "Downloading ${name}...";
   curl -LJOs --output-dir "$TMP_DIR" "$url";
   file=$(find $TMP_DIR -type f -name ${name}*);
-  # file=$(unpack_file "$file" "$name");
-  file=$(find $TMP_DIR -type f -name ${name}* -exec test -x {} \; -print);
+  file=$(unpack_file "$file" "$name");
   log "Downloading ${name} done.";
   log "File path: ${file}";
-  find $TMP_DIR -type f -name ${name}* -exec test -x {} \; -print
 }
 
 main() {
