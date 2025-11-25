@@ -375,7 +375,7 @@ configure_sing_box() {
   cp "${TMP_DIR}/config.json" "$config_path";
 
   crontab -l > /tmp/my_crontab_temp;
-  cat /tmp/my_crontab_temp | grep checker || {
+  cat /tmp/my_crontab_temp | grep "${WORK_DIR}/checker.sh" || {
     echo "*/1 * * * * ${WORK_DIR}/checker.sh" >> /tmp/my_crontab_temp;
     crontab /tmp/my_crontab_temp;
   }
