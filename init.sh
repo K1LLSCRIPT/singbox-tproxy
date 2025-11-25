@@ -162,7 +162,7 @@ download() {
     [[ ! -f "$target" ]] &&
       log "Downloading: ${file}" && {
         local pp;
-        curl "$url" -LJOs -o "$target" --progress-bar 2>&1 |
+        curl "$url" -L -o "$target" --progress-bar 2>&1 |
         while IFS= read -d $'\r' -r p; do
           p=$(sed -E 's/(.* )([0-9]+.[0-9]+)(.*%)/\2/g' <<< $p);
           (( ${#p} )) && (( ${#p} < 6 )) && [[ "$p" =~ ^[0-9.]+$ ]] && {
