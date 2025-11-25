@@ -228,7 +228,21 @@ configure_dhcp() {
     init_dns="8.8.8.8" \
     sing_dns="127.0.0.1#5353";
 
+  list_servers=(
+    "pool.ntp.org"
+    "dynamo.vision"
+    "darkvpn.net"
+    "darkvpn.app"
+    "zbs.ninja"
+  );
+  
   echo "server=$sing_dns" > /etc/dnsmasq.servers;
+
+  for g in "${list_servers[@]}"; do
+    echo "/${g}/${init_dns}"   >> /etc/dnsmasq.servers;
+    echo "/*.${g}/${init_dns}" >> /etc/dnsmasq.servers;
+  done
+  #server=/domain/1.2.3.4
 
   dhcp_params=(
     "dhcp.@dnsmasq[0].serversfile=/etc/dnsmasq.servers"
@@ -236,10 +250,10 @@ configure_dhcp() {
     "dhcp.@dnsmasq[0].localise_queries=1"
     "dhcp.@dnsmasq[0].rebind_protection=1"
     "dhcp.@dnsmasq[0].rebind_localhost=1"
-    "dhcp.@dnsmasq[0].local=local"
+    "dhcp.@dnsmasq[0].local=/local/"
     "dhcp.@dnsmasq[0].domain=local"
     "dhcp.@dnsmasq[0].expandhosts=1"
-    "dhcp.@dnsmasq[0].cachesize=100"
+    "dhcp.@dnsmasq[0].cachesize=0"
     "dhcp.@dnsmasq[0].authoritative=1"
     "dhcp.@dnsmasq[0].readethers=1"
     "dhcp.@dnsmasq[0].leasefile=/tmp/dhcp.leases"
@@ -247,6 +261,8 @@ configure_dhcp() {
     "dhcp.@dnsmasq[0].ednspacket_max=1232"
     "dhcp.@dnsmasq[0].filter_aaaa=1"
     "dhcp.@dnsmasq[0].noresolv=1"
+    "dhcp.@dnsmasq[0].localuse=1"
+    "dhcp.@dnsmasq[0].nonegcache=1"
   );
 
   local c=$(uci show dhcp | grep "=dnsmasq" | wc -l);
