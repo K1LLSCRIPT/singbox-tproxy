@@ -210,7 +210,8 @@ get_file() {
     #log "File path0: ${file}";
     #file=$(unpack_file "$file" "$name");
     clean_dir "$name" "$WORK_DIR";
-    unpack_file "$file" "$name";
+    file=$(unpack_file "$file" "$name");
+    #unpack_file "$file" "$name";
     file=$(find "$WORK_DIR" -type f -name "$name" -exec test -x {} \; -print);
   #  log "Downloading ${name} done.";
   #  log "File path: ${file}";
