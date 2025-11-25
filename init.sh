@@ -378,7 +378,7 @@ configure_sing_box() {
   mkdir -p /var/spool/cron/crontabs;
   touch /etc/crontabs/root;
 
-  cat /etc/crontabs/root | grep "${WORK_DIR}/checker.sh" || {
+  grep -qF "${WORK_DIR}/checker.sh" /etc/crontabs/root || {
     echo "*/1 * * * * ${WORK_DIR}/checker.sh" >> /etc/crontabs/root;
     /etc/init.d/cron reload
   }
