@@ -65,6 +65,7 @@ check_user_args(){
 
 check_user_args;
 
+rm -rf "$TMP_DIR";
 mkdir -p "$TMP_DIR";
 
 get_url() {
@@ -80,7 +81,7 @@ get_url() {
 download() {
   local url=$(get_url);
   log "download: ${url}";
-  curl -LJOs -o "$TMP_DIR" "$url";
+  curl -LJOs --output-dir "$TMP_DIR" "$url";
 }
 
 (( $SINGBOX_EXTENDED )) && download
