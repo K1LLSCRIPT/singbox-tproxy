@@ -42,7 +42,7 @@ check_input() {
     (( $url )) && {
       [[ "$inp" =~ $reg ]] && return 0;
     } || {
-      (( ${#inp} )) && [[ ! "$inp" =~ $reg ]] && return 0;
+      (( ${#inp} )) && return 0;
     }
     return 1;
 }
