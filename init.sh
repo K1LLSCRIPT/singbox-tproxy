@@ -168,17 +168,16 @@ configure_dhcp() {
   );
 
   local c=$(uci show dhcp | grep "=dnsmasq" | wc -l);
-##  ((c--));
-  log "s_count: ${c}"
+
+  log "Configuring DHCP. Servers found: ${c}";
 
   for (( i=0; i<$c; i++ )); do
     for p in "${dhcp_params[@]}"; do
       echo $(echo "$p" | sed -E "s/(.*)(\[.\])(.*)/\1\[${i}\]\3/");
-    #  echo "dhcp_param ${i}: ${p}";
-
+    #  uci -q set $(echo "$p" | sed -E "s/(.*)(\[.\])(.*)/\1\[${i}\]\3/");
     done
   done
-
+  #uci commit dhcp;
 }
 
 main() {
