@@ -173,7 +173,9 @@ configure_dhcp() {
 
   for (( i=0; i<$c; i++ )); do
     for p in "${dhcp_params[@]}"; do
-      echo "dhcp_param ${i}: ${p}";
+      echo $(echo "$p" | sed -E "s/(.*)(\[.\])(.*)/\1\[${i}\]\3/");
+    #  echo "dhcp_param ${i}: ${p}";
+
     done
   done
 
