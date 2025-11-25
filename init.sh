@@ -35,7 +35,7 @@ USER_ARGS=(
 
 check_user_args(){
   for a in "${USER_ARGS[@]}"; do
-    local s=$(cat "${WORK_DIR}/${CONFIG_FILE}" | grep "$a" | head -n 1 | sed -E "s/(${v})(.*)/\2/" | sed -E 's/["'\''=;]//g');
+    local s=$(cat "${WORK_DIR}/${CONFIG_FILE}" | grep "$a" | head -n 1 | sed -E "s/(${a})(.*)/\2/" | sed -E 's/["'\''=;]//g');
     log "${a}: ${s}";
     (( ${#s} )) || echo "need: ${a}"
 #    (( ${#a} )) || {
