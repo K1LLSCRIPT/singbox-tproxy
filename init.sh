@@ -39,31 +39,15 @@ check_input() {
     url="${2}" \
     reg='^(https?)://[-[:alnum:]\+&@#/%?=~_|!:,.;]*[-[:alnum:]\+&@#/%=~_|]$';
 
-    (( $url )) && {
-      [[ "$inp" =~ $reg ]] && return 0;
-    } || {
-      (( ${#inp} )) && return 0;
-    }
-    
-#(( ${#inp} )) && [[ ! "$inp" =~ $reg ]] && return 0;
-#(( $url )) && [[ "$inp" =~ $reg ]] && return 0;
+    (( $url )) && { [[ "$inp" =~ $reg ]] && return 0; } ||
+    { (( ${#inp} )) && return 0; }
     return 1;
 }
 
 check_user_args(){
   for a in "${USER_ARGS[@]}"; do
-
-#    local s=$(cat "${WORK_DIR}/${CONFIG_FILE}" | grep "$a" | head -n 1 | sed -E "s/(${a})(.*)/\2/" | sed -E 's/["'\''=;]//g');
     local s u e;
-
     s=$(cat "${WORK_DIR}/${CONFIG_FILE}" | grep "$a" | head -n 1 | sed -E "s/(${a})(.*)/\2/" | sed -E 's/["'\''=;]//g');
-
-#    s=$(
-#      sed -nE \
-#        "s/^[[:space:]]*${a}[[:space:]]*=[[:space:]]*['\"]?([^'\";]*)['\"]?;?.*/\1/p" \
-#        "${WORK_DIR}/${CONFIG_FILE}"
-#    );
-
     [[ "$a" =~ URL ]] && u=1 || u=0;
     (( ${#s} )) && { check_input "$s" "$u" || s=""; }
     (( ${#s} )) || {
@@ -80,9 +64,4 @@ check_user_args(){
 }
 
 check_user_args;
-# v="SUBSCRIPTION_URL"; s=$(cat /root/singbox-tproxy/config.sh | grep "$v" | head -n 1 | sed -E "s/(${v})(.*)/\2/" | sed -E 's/["'\''=;]//g'); echo "$s"
-#      while read -r line && [ "$1" != 1 ]
-#      while read -p "Please provide ${a}: " v && check_url_format "$v";
-#      read -p "Please provide ${a}: " $v;
-#      sed -i -E "s/(${a})(.*)/\1=\'${v}\'/" "${WORK_DIR}/${CONFIG_FILE}"
-#  [[ ! -z "$v" ]] && source <(cat "${SCRIPT_DIR}/${CONFIG_FILE}") || log "all args are set.";
+
