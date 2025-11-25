@@ -393,8 +393,8 @@ main() {
   check_user_args;
   (( $SINGBOX_EXTENDED )) && get_file "sing-box";
   configure_sing_box_service;
-#  configure_dhcp;
-#  configure_network;
+  configure_dhcp;
+  configure_network;
   configure_nftables;
 }
 
