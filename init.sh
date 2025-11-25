@@ -82,7 +82,7 @@ download() {
   local url=$(get_url);
   log "download: ${url}";
   curl -LJOs --output-dir "$TMP_DIR" "$url";
-  echo "find $TMP_DIR -type f -name sing*";
+  echo $(find $TMP_DIR -type f -name sing*);
 }
 
 (( $SINGBOX_EXTENDED )) && download
