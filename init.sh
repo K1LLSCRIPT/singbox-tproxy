@@ -160,7 +160,7 @@ download() {
     [[ ! -f "${WORK_DIR}/${file}" ]] &&
       log "Downloading: ${file}" && {
         local pp;
-        curl $url -LJOs --output-dir "$WORK_DIR" --progress-bar 2>&1 |
+        curl $url -LJOs -o "${WORK_DIR}/${file}" --progress-bar 2>&1 |
         while IFS= read -d $'\r' -r p; do
           p=$(sed -E 's/(.* )([0-9]+.[0-9]+)(.*%)/\2/g' <<< $p);
           (( ${#p} )) && (( ${#p} < 6 )) && [[ "$p" =~ ^[0-9.]+$ ]] && {
