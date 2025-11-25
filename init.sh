@@ -273,6 +273,7 @@ configure_nftables() {
 }
 
 main() {
+  prepare;
   check_deps || { error "Failed to install packages"; exit 1; }
   check_user_args;
   (( $SINGBOX_EXTENDED )) && download;
