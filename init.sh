@@ -363,29 +363,16 @@ configure_nftables() {
     cp "${WORK_DIR}/${file_nft_out}" "$config_path";
 }
 
-download_inbounds_config() {
-  log "Downloading inbounds config from $INBOUNDS_CONFIG_URL...";
-  curl -fsSL "$INBOUNDS_CONFIG_URL" -o "$LOCAL_INBOUNDS_CONFIG" || {
-    error "Failed to download inbounds config from $INBOUNDS_CONFIG_URL.";
-    exit 1;
-  }
-  log "Inbounds config downloaded successfully.";
-}
-
-download_extended_config() {
-  log "Downloading extended config from $INBOUNDS_CONFIG_URL...";
-  curl -fsSL "$INBOUNDS_CONFIG_URL" -o "$LOCAL_INBOUNDS_CONFIG" || {
-    error "Failed to download extended config from $INBOUNDS_CONFIG_URL.";
-    exit 1;
-  }
-  log "Extended config downloaded successfully.";
-}
-
 configure_sing_box() {
   local \
     config_path=$(uci -q get sing-box.main.conffile);
-
-
+  log_message "Configuring sing-box";
+  local url='https://zbs.ninja/ibyfsk7c2dat/sing/noredir/config.json';
+  local backup_dir="${WORK_DIR}/backup/$(date +"%Y-%m-%d-%H-%M-%S")";
+  mkdir -p "$backup_dir";
+  curl "$url" -L -o "${TMP_DIR}/config.json";
+  cp "$config_path" "$backup_dir";
+  cp "${TMP_DIR}/config.json" "$config_path";
 }
 
 prog_control() {
@@ -407,8 +394,7 @@ restart_service(){
   local \
     program="$1";
   log "Restarting $program service."
-  prog_control "$program" stop;
-  prog_control "$program" start;
+  service "$program" restart;
 }
 
 main() {
@@ -423,6 +409,8 @@ main() {
   restart_service "network"
   restart_service "dnsmasq"
   restart_service "firewall"
+  prog_control "sing-box" stop;
+  prog_control "sing-box" start;
 }
 
 main;
