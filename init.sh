@@ -100,8 +100,8 @@ get_url() {
 
 unpack_file() {
   local \
-    file="${1}" \
-    name="${2}";
+    file="$1" \
+    name="$2";
 
   [[ -f "$file" ]] && {
     local dir=$(find "$WORK_DIR" -type d -name "${name}*");
