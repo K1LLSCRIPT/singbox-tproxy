@@ -48,7 +48,7 @@ check_user_args(){
 
     (( ${#s} )) && [[ "$a" =~ URL ]] && { check_url_format "$s" || s=""; }
     (( ${#s} )) || {
-      while (check_url_format "$s"); do
+      until check_url_format "$s"; do
       s=$(printf '%s' "Please provide ${a}: " >&2; read x && printf '%s' "$x")
       done
 #      while read -r line && [ "$1" != 1 ]
