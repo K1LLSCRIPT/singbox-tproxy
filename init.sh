@@ -50,7 +50,7 @@ check_user_args(){
     local u;
     ((( ${#s} )) && [[ "$a" =~ URL ]]) && { check_input_format "$s" "1" || s=""; }
     (( ${#s} )) || {
-      [[ "$a" =~ URL ]]) && u=1 || u=0;
+      [[ "$a" =~ URL ]] && u=1 || u=0;
       until check_input_format "$s" "$u"; do
         s=$(printf '%s' "Please provide ${a}: " >&2; read x && printf '%s' "$x")
       done
