@@ -176,12 +176,12 @@ download() {
         done;
       }
     sleep 1;
-    check_file "$file" && {
+    check_file "$target" && {
       log "File: ${file} downloaded and passed checks.";
       return 0;
     } || {
       error "File: ${file} failed check, retrying...";
-      rm -f "$file";
+      rm -f "$target";
       ((count++));
       sleep 5;
     }
