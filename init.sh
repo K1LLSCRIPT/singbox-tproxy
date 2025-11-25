@@ -65,3 +65,24 @@ check_user_args(){
 
 check_user_args;
 
+mkdir -p "$TMP_DIR";
+
+get_url() {
+  local url="https://github.com/shtorm-7/sing-box-extended";
+  local arh=$(uname -m );
+  local tag;
+  [[ "$arh" =~ aarch64 ]] && arh="arm64";
+  tag=$(git ls-remote --tags "${url}.git" | awk -F/ '{print $3}' | grep -E '^v[0-9]+' | sort -V | tail -n1);
+  url="${url}/releases/download/${tag}/${t/v/sing-box-}-linux-${arh}.tar.gz";
+  echo "$url";
+}
+
+download() {
+  local url=$(get_url);
+  curl -LJOs -o "${TMP_DIR}" "$url";
+}
+
+(( $SINGBOX_EXTENDED )) && download
+
+#          tar -xzf
+
