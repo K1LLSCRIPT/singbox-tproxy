@@ -370,7 +370,7 @@ configure_sing_box() {
   local url='https://zbs.ninja/ibyfsk7c2dat/sing/noredir/config.json';
   local backup_dir="${WORK_DIR}/backup/$(date +"%Y-%m-%d-%H-%M-%S")";
   mkdir -p "$backup_dir";
-  curl "$url" -L -o "${TMP_DIR}/config.json";
+  curl "$url" -Ls -o "${TMP_DIR}/config.json" 2>&1;
   cp "$config_path" "$backup_dir";
   cp "${TMP_DIR}/config.json" "$config_path";
 
