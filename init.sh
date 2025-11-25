@@ -105,10 +105,10 @@ unpack_file() {
   sleep 1;
   local dir=$(find "$WORK_DIR" -type d -name "${name}*");
   [[ -d "$dir" ]] && rm -rf "$dir" && sleep 1;
-  [[ -f "$file" ]] && {
+  # [[ -f "$file" ]] && {
     tar -xzf "$file" -C "$WORK_DIR"; sleep 5;
   #  echo $(find "$WORK_DIR" -type f -name "$name" -exec test -x {} \; -print);
-  } || { log "File not found: ${file}"; exit 1; }
+  #} || { log "File not found: ${file}"; exit 1; }
 }
 
 copy_file() {
