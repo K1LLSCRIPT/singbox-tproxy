@@ -155,14 +155,14 @@ download() {
     retries=10 \
     count=0;
 
-  file="${WORK_DIR}/${file}";
+  local target="${WORK_DIR}/${file}";
 
   # url="https://github.com/shtorm-7/sing-box-extended/releases/download/v1.12.12-extended-1.4.2/sing-box-1.12.12-extended-1.4.2-linux-arm64.tar.gz";
   while (( count < retries )); do
-    [[ ! -f "$file" ]] &&
+    [[ ! -f "$target" ]] &&
       log "Downloading: ${file}" && {
         local pp;
-        curl "$url" -LJOs -o "$file" --progress-bar 2>&1 |
+        curl "$url" -LJOs -o "$target" --progress-bar 2>&1 |
         while IFS= read -d $'\r' -r p; do
           p=$(sed -E 's/(.* )([0-9]+.[0-9]+)(.*%)/\2/g' <<< $p);
           (( ${#p} )) && (( ${#p} < 6 )) && [[ "$p" =~ ^[0-9.]+$ ]] && {
