@@ -101,8 +101,10 @@ unpack_file() {
     file="${1}" \
     name="${2}";
   [[ -f "$file" ]] && {
-    tar -xzf "$file" -C "${TMP_DIR}";
-    echo $(find $TMP_DIR -type f -name ${name} -exec test -x {} \; -print);
+    local dir=$(find "$WORK_DIR" -type d -name "${name}*");
+    [[ -z "$dir" ]] && [[ -d "$dir" ]] && rm -rf "$dir";
+    tar -xzf "$file" -C "${WORK_DIR}";
+    echo $(find "$WORK_DIR" -type f -name "${name}" -exec test -x {} \; -print);
   }
 }
 
@@ -111,23 +113,29 @@ copy_file() {
     file="${1}" \
     name="${2}" \
     dest=$(which "$name");
-  log "Copy file: ${file} to: ${dest}";
-  cp "$file" "$dest";
+  [[ -f "$file" ]] && {
+    log "Copy file: ${file} to: ${dest}";
+    cp "$file" "$dest";
+  } || { log "Copy file: ${name} FAILED"; exit 1; }
 }
 
 download() {
   local  url  file \
     name="sing-box";
   url=$(get_url);
-  log "Downloading ${name}...";
-  curl -LJOs --output-dir "$TMP_DIR" "$url";
-  file=$(find $TMP_DIR -type f -name ${name}*);
+  [[ ! -f "${WORK_DIR}/${url##*/}" ]] && {
+    log "Downloading ${name}...";
+    curl -LJOs --output-dir "$WORK_DIR" "$url";
+  }
+  file=$(find "$WORK_DIR" -type f -name "${name}*");
   file=$(unpack_file "$file" "$name");
   log "Downloading ${name} done.";
   log "File path: ${file}";
   copy_file "$file" "$name";
 }
-
+# https://github.com/shtorm-7/sing-box-extended/releases/download/v1.12.12-extended-1.4.2/sing-box-1.12.12-extended-1.4.2-linux-arm64.tar.gz
+# url="https://github.com/shtorm-7/sing-box-extended/releases/download/v1.12.12-extended-1.4.2/sing-box-1.12.12-extended-1.4.2-linux-arm64.tar.gz"; file="${url##*/}"; echo "$file"        
+# sing-box-1.12.12-extended-1.4.2-linux-arm64.tar.gz
 configure_sing_box_service() {
   local \
     enabled=$(uci -q get sing-box.main.enabled) \
