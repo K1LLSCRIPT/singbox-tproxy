@@ -102,7 +102,7 @@ unpack_file() {
   local \
     file="$1" \
     name="$2";
-
+  sleep 1;
   local dir=$(find "$WORK_DIR" -type d -name "${name}*");
   [[ -d "$dir" ]] && rm -rf "$dir";
   [[ -f "$file" ]] && {
@@ -113,6 +113,7 @@ unpack_file() {
     tar -xzf "$file" -C "$WORK_DIR";
     #local bin=$(find "$WORK_DIR" -type f -name "$name" -exec test -x {} \; -print);
     #echo "$bin";
+    sleep 5;
   } || { log "File not found: ${file}"; exit 1; }
 }
 # WORK_DIR="/root/singbox-tproxy"; name="sing-box"; echo $(find "$WORK_DIR" -type f -name "${name}" -exec test -x {} \; -print);
