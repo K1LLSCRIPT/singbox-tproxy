@@ -53,7 +53,7 @@ check_user_args(){
     (( ${#s} )) || {
       until (check_input "$s" "$u"); do
         s=$(printf '%s' "Please provide ${a}: " >&2; read x && printf '%s' "$x");
-        sed -i -E '1s/(${a})(.*)/\1=\'${s}\'/' "${WORK_DIR}/${CONFIG_FILE}";
+        sed -i -E "1s/(${a})(.*)/\1=\'${s}\'/" "${WORK_DIR}/${CONFIG_FILE}";
       done
     }
   done
