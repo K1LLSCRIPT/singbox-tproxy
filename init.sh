@@ -170,6 +170,10 @@ configure_dhcp() {
   for p in "${dhcp_params[@]}"; do
     echo "dhcp_param: ${p}";
   done
+
+  local s_count=$(uci show dhcp | grep "=dnsmasq" | wc -l);
+  ((s_count--));
+  log "s_count: ${s_count}"
 }
 
 main() {
