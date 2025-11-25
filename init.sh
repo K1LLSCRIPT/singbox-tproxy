@@ -154,13 +154,11 @@ download() {
     url="$2" \
     retries=10 \
     count=0;
-
   file="${WORK_DIR}/${file}";
 
-  # url="https://github.com/shtorm-7/sing-box-extended/releases/download/v1.12.12-extended-1.4.2/sing-box-1.12.12-extended-1.4.2-linux-arm64.tar.gz";
   while (( count < retries )); do
     [[ ! -f "$file" ]] &&
-      log "Downloading: ${file}" && {
+      log "Downloading: ${file##*/} to ${file%/*}" && {
         local pp;
         curl "$url" -L -o "$file" --progress-bar 2>&1 |
         while IFS= read -d $'\r' -r p; do
@@ -177,16 +175,16 @@ download() {
       }
     sleep 1;
     check_file "$file" && {
-      log "File: ${file} downloaded and passed checks.";
+      log "File: ${file##*/} downloaded and passed checks.";
       return 0;
     } || {
-      error "File: ${file} failed check, retrying...";
+      error "File: ${file##*/} failed check, retrying...";
       rm -f "$file";
       ((count++));
       sleep 5;
     }
   done;
-  error "Failed to download ${file} after ${retries} attempts";
+  error "Failed to download ${file##*/} after ${retries} attempts";
   return 1;
 }
 
@@ -207,14 +205,10 @@ get_file() {
   url=$(get_url "$name");
   download "${url##*/}" "${url}" && {
     file=$(find "$WORK_DIR" -type f -name "${name}*");
-    #log "File path0: ${file}";
-    #file=$(unpack_file "$file" "$name");
     clean_dir "$name" "$WORK_DIR";
     file=$(unpack_file "$file" "$name");
     #unpack_file "$file" "$name";
     file=$(find "$WORK_DIR" -type f -name "$name" -exec test -x {} \; -print);
-  #  log "Downloading ${name} done.";
-  #  log "File path: ${file}";
     copy_file "$file" "$name";
     clean_dir "$name" "$WORK_DIR";
   } || { error "Get file: ${name} FAILED. Exiting."; exit 1; }
