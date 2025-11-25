@@ -86,10 +86,9 @@ check_user_args(){
 }
 
 get_url() {
-  local \
-    tag \
-    url="https://github.com/shtorm-7/sing-box-extended";
-    arh=$(uname -m );
+  local tag url arh;
+  arh=$(uname -m );
+  url="https://github.com/shtorm-7/sing-box-extended";
   [[ "$arh" =~ aarch64 ]] && arh="arm64";
   tag=$(git ls-remote --tags "${url}.git" | awk -F/ '{print $3}' | grep -E '^v[0-9]+' | sort -V | tail -n1);
   url="${url}/releases/download/${tag}/${tag/v/sing-box-}-linux-${arh}.tar.gz";
