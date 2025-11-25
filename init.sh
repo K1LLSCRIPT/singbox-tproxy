@@ -378,8 +378,8 @@ configure_sing_box() {
   mkdir -p /var/spool/cron/crontabs;
   touch /etc/crontabs/root;
 
-  grep -qF "/root/singbox-tproxy/checker.sh" /etc/crontabs/root || {
-    echo '*/1 * * * * /root/singbox-tproxy/checker.sh' >> /etc/crontabs/root;
+  grep -qF "${WORK_DIR}/checker.sh" /etc/crontabs/root || {
+    echo "*/1 * * * * ${WORK_DIR}/checker.sh" >> /etc/crontabs/root;
     /etc/init.d/cron reload;
   }
 }
@@ -415,6 +415,7 @@ main() {
   configure_dhcp;
   configure_network;
   configure_nftables;
+  configure_sing_box;
   restart_service "network"
   restart_service "dnsmasq"
   restart_service "firewall"
