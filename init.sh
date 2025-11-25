@@ -255,7 +255,7 @@ configure_dhcp() {
 
   for (( i=0; i<$c; i++ )); do
     for p in "${dhcp_params[@]}"; do
-      echo $(echo "$p" | sed -E "s/(.*)(\[.\])(.*)/\1\[${i}\]\3/");
+    #  echo $(echo "$p" | sed -E "s/(.*)(\[.\])(.*)/\1\[${i}\]\3/");
       uci -q set $(echo "$p" | sed -E "s/(.*)(\[.\])(.*)/\1\[${i}\]\3/");
     done
   done
