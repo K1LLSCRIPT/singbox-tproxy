@@ -156,14 +156,15 @@ download() {
     retries=10 \
     count=0;
 #  cd "$TMP_DIR";
-  file="${WORK_DIR}/sing-box.tar.gz";
+#  file="${WORK_DIR}/sing-box.tar.gz";
+  file="${WORK_DIR}/${file}";
   #echo "$url";
   url="https://github.com/shtorm-7/sing-box-extended/releases/download/v1.12.12-extended-1.4.2/sing-box-1.12.12-extended-1.4.2-linux-arm64.tar.gz";
   while (( count < retries )); do
     [[ ! -f "$file" ]] &&
       log "Downloading: ${file}" && {
         local pp;
-        curl "$url" -Ls -o "$file" --progress-bar 2>&1 |
+        curl "$url" -L -o "$file" --progress-bar 2>&1 |
         while IFS= read -d $'\r' -r p; do
           p=$(sed -E 's/(.* )([0-9]+.[0-9]+)(.*%)/\2/g' <<< $p);
           (( ${#p} )) && (( ${#p} < 6 )) && [[ "$p" =~ ^[0-9.]+$ ]] && {
