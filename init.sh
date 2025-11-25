@@ -38,9 +38,8 @@ check_input() {
     inp="${1}" \
     url="${2}" \
     reg='^(https?)://[-[:alnum:]\+&@#/%?=~_|!:,.;]*[-[:alnum:]\+&@#/%=~_|]$';
-    (( $url )) || return 0;
-    (( $url )) && [[ "$inp" =~ $reg ]] &&
-    return 0;
+    (( $url )) || ((( ${#inp} )) && [[ ! "$inp" =~ $reg ]] && return 0);
+    (( $url )) && [[ "$inp" =~ $reg ]] && return 0;
     return 1;
 }
 
