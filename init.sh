@@ -55,11 +55,13 @@ check_user_args(){
 #    local s=$(cat "${WORK_DIR}/${CONFIG_FILE}" | grep "$a" | head -n 1 | sed -E "s/(${a})(.*)/\2/" | sed -E 's/["'\''=;]//g');
     local s u e;
 
-    s=$(
-      sed -nE \
-        "s/^[[:space:]]*${a}[[:space:]]*=[[:space:]]*['\"]?([^'\";]*)['\"]?;?.*/\1/p" \
-        "${WORK_DIR}/${CONFIG_FILE}"
-    );
+    s=$(cat "${WORK_DIR}/${CONFIG_FILE}" | grep "$a" | head -n 1 | sed -E "s/(${a})(.*)/\2/" | sed -E 's/["'\''=;]//g');
+
+#    s=$(
+#      sed -nE \
+#        "s/^[[:space:]]*${a}[[:space:]]*=[[:space:]]*['\"]?([^'\";]*)['\"]?;?.*/\1/p" \
+#        "${WORK_DIR}/${CONFIG_FILE}"
+#    );
 
     [[ "$a" =~ URL ]] && u=1 || u=0;
     (( ${#s} )) && { check_input "$s" "$u" || s=""; }
