@@ -179,7 +179,7 @@ download() {
       return 0;
     } || {
       log "File: ${file} failed check, retrying...";
-      rm -f "$WORK_DIR/${file}";
+      rm -f "${WORK_DIR}/${file}";
       ((count++));
       sleep 5;
     }
