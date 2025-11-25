@@ -33,7 +33,7 @@ USER_ARGS=(
   INBOUNDS_CONFIG_URL
 );
 
-check_url_format() {
+check_input() {
   local \
     inp="${1}" \
     url="${2}" \
@@ -48,10 +48,10 @@ check_user_args(){
   for a in "${USER_ARGS[@]}"; do
     local s=$(cat "${WORK_DIR}/${CONFIG_FILE}" | grep "$a" | head -n 1 | sed -E "s/(${a})(.*)/\2/" | sed -E 's/["'\''=;]//g');
     local u;
-    ((( ${#s} )) && [[ "$a" =~ URL ]]) && { check_input_format "$s" "1" || s=""; }
+    ((( ${#s} )) && [[ "$a" =~ URL ]]) && { check_input "$s" "1" || s=""; }
     (( ${#s} )) || {
       [[ "$a" =~ URL ]] && u=1 || u=0;
-      until check_input_format "$s" "$u"; do
+      until check_input "$s" "$u"; do
         s=$(printf '%s' "Please provide ${a}: " >&2; read x && printf '%s' "$x")
       done
     }
