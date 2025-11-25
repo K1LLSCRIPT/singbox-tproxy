@@ -151,8 +151,8 @@ check_file () {
 
 download() {
   local \
-    file="${1}" \
-    url="${2}" \
+    file="$1" \
+    url="$2" \
     retries=10 \
     count=0;
 
