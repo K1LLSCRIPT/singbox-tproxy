@@ -264,7 +264,7 @@ configure_nftables() {
     config_path \
     file_voice;
 
-    log "Creating nftables config."
+    echo; log "Creating nftables config."; echo;
     file_nft_out="30-${file_nft%%.*}.nft";
     config_path="/etc/nftables.d/${file_nft_out}";
 
