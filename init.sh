@@ -45,15 +45,14 @@ check_url_format() {
 check_user_args(){
   for a in "${USER_ARGS[@]}"; do
     local s=$(cat "${WORK_DIR}/${CONFIG_FILE}" | grep "$a" | head -n 1 | sed -E "s/(${a})(.*)/\2/" | sed -E 's/["'\''=;]//g');
-#    log "${a}: ${s}";
 
     (( ${#s} )) && [[ "$a" =~ URL ]] && { check_url_format "$s" || s=""; }
-
-    (( ${#s} )) || echo "need: ${a}"
-#    (( ${#a} )) || {
+    (( ${#s} )) || {
+#      while read -r line && [ "$1" != 1 ]
+      while read -p "Please provide ${a}: " $v && check_url_format $v;
 #      read -p "Please provide ${a}: " $v;
-#      sed -i -E "s/(${a})(.*)/\1=\'${v}\'/" "${WORK_DIR}/${CONFIG_FILE}";
-#    }
+      sed -i -E "s/(${a})(.*)/\1=\'${v}\'/" "${WORK_DIR}/${CONFIG_FILE}";
+    }
   done
 #  [[ ! -z "$v" ]] && source <(cat "${SCRIPT_DIR}/${CONFIG_FILE}") || log "all args are set.";
 }
