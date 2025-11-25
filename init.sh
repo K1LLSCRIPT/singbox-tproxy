@@ -14,7 +14,7 @@ source <(cat "${SCRIPT_DIR}/log.sh");
   for f in $(find "$SCRIPT_DIR" -type f -name "*.sh"); do
     [[ "${f##*/}" == "config.sh" ]] &&
     [[ -f "${WORK_DIR}/${CONFIG_FILE}" ]] ||
-    { cp "$f" "$WORK_DIR"; log "Copy file: ${f} to: ${WORK_DIR}";
+    { cp "$f" "$WORK_DIR"; log "Copy file: ${f} to: ${WORK_DIR}"; }
   done
   exec "${WORK_DIR}/init.sh" "$@";
 }
