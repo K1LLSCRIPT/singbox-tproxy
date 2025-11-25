@@ -110,13 +110,13 @@ unpack_file() {
     echo $(find "$WORK_DIR" -type f -name "$name" -exec test -x {} \; -print);
   } || { log "File not found: ${file}"; exit 1; }
 }
-# WORK_DIR="/root/singbox-tproxy"; name="sing-box"; echo $(find "$WORK_DIR" -type f -name "${name}" -exec test -x {} \; -print);
-# WORK_DIR="/root/singbox-tproxy"; name="sing-box"; echo $(find "$WORK_DIR" -type d -name "${name}*")
+
 copy_file() {
   local \
     file="${1}" \
-    name="${2}" \
-    dest=$(which "$name");
+    name="${2}";
+  which "$name" >/dev/null || opkg install sing-box --force-reinstall;
+  local dest=$(which "$name");
   [[ -f "$file" ]] && {
     log "Copy file: ${file} to: ${dest}";
     cp "$file" "$dest";
@@ -155,8 +155,7 @@ download() {
     url="${2}" \
     retries=10 \
     count=0;
-  #  echo "$url";
-#url="https://github.com/shtorm-7/sing-box-extended/releases/download/v1.12.12-extended-1.4.2/sing-box-1.12.12-extended-1.4.2-linux-arm64.tar.gz";
+
   while (( count < retries )); do
     [[ ! -f "${WORK_DIR}/${file}" ]] &&
       log "Downloading: ${file}" && {
@@ -174,7 +173,7 @@ download() {
           }
         done;
       }
-
+    sleep 1;
     check_file "${WORK_DIR}/${file}" && {
       log "File: ${file} downloaded and passed checks.";
       return 0;
