@@ -119,6 +119,7 @@ download() {
   file=$(find $TMP_DIR -type f -name ${name}* -exec test -x {} \; -print);
   log "Downloading ${name} done.";
   log "File path: ${file}";
+  find $TMP_DIR -type f -name ${name}* -exec test -x {} \; -print
 }
 
 main() {
