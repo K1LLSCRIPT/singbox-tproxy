@@ -374,12 +374,15 @@ configure_sing_box() {
   cp "$config_path" "$backup_dir";
   cp "${TMP_DIR}/config.json" "$config_path";
 
-  crontab -l > /tmp/my_crontab_temp;
-  cat /tmp/my_crontab_temp | grep "${WORK_DIR}/checker.sh" || {
-    echo "*/1 * * * * ${WORK_DIR}/checker.sh" >> /tmp/my_crontab_temp;
-    crontab /tmp/my_crontab_temp;
+  #crontab -l > /tmp/my_crontab_temp;
+  
+  #cat /tmp/my_crontab_temp | grep "${WORK_DIR}/checker.sh" || {
+  crontab -l | grep "${WORK_DIR}/checker.sh" || {
+    ( ( crontab -l ; echo "*/1 * * * * ${WORK_DIR}/checker.sh" ) | crontab - ) >& /dev/null;
+    #echo "*/1 * * * * ${WORK_DIR}/checker.sh" >> /tmp/my_crontab_temp;
+    #crontab /tmp/my_crontab_temp;
   }
-  rm /tmp/my_crontab_temp;
+  #rm /tmp/my_crontab_temp;
 }
 
 prog_control() {
