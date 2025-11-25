@@ -106,10 +106,11 @@ unpack_file() {
     local dir=$(find "$WORK_DIR" -type d -name "${name}*");
     [[ -z "$dir" ]] && [[ -d "$dir" ]] && rm -rf "$dir";
     tar -xzf "$file" -C "$WORK_DIR";
-    echo $(find "$WORK_DIR" -type f -name "${name}" -exec test -x {} \; -print);
+    local bin=$(find "$WORK_DIR" -type f -name "${name}" -exec test -x {} \; -print);
+    echo "$bin";
   }
 }
-
+# WORK_DIR="/root/singbox-tproxy"; name="sing-box"; echo $(find "$WORK_DIR" -type f -name "${name}" -exec test -x {} \; -print);
 copy_file() {
   local \
     file="${1}" \
