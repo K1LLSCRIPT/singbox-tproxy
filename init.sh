@@ -55,14 +55,13 @@ check_user_args(){
         s=$(printf '%s' "Please provide ${a}: " >&2; read x && printf '%s' "$x")
       done
     }
+  done
+#  [[ ! -z "$v" ]] && source <(cat "${SCRIPT_DIR}/${CONFIG_FILE}") || log "all args are set.";
+}
+
+check_user_args;
+# v="SUBSCRIPTION_URL"; s=$(cat /root/singbox-tproxy/config.sh | grep "$v" | head -n 1 | sed -E "s/(${v})(.*)/\2/" | sed -E 's/["'\''=;]//g'); echo "$s"
 #      while read -r line && [ "$1" != 1 ]
 #      while read -p "Please provide ${a}: " v && check_url_format "$v";
 #      read -p "Please provide ${a}: " $v;
 #      sed -i -E "s/(${a})(.*)/\1=\'${v}\'/" "${WORK_DIR}/${CONFIG_FILE}";
-    }
-  done
-#  [[ ! -z "$v" ]] && source <(cat "${SCRIPT_DIR}/${CONFIG_FILE}") || log "all args are set.";
-
-
-check_user_args;
-# v="SUBSCRIPTION_URL"; s=$(cat /root/singbox-tproxy/config.sh | grep "$v" | head -n 1 | sed -E "s/(${v})(.*)/\2/" | sed -E 's/["'\''=;]//g'); echo "$s"
