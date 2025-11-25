@@ -28,7 +28,6 @@ deps=(
   sing-box
   kmod-nft-tproxy
   git-http
-  wget
   curl
   jq
 );
