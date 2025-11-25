@@ -103,10 +103,10 @@ unpack_file() {
     file="$1" \
     name="$2";
   sleep 1;
-  local dir=$(find "$WORK_DIR" -type d -name "${name}*");
+  local dir=$(find "$TMP_DIR" -type d -name "${name}*");
   [[ -d "$dir" ]] && rm -rf "$dir" && sleep 1;
   # [[ -f "$file" ]] && {
-    tar -xzf "$file" -C "$WORK_DIR"; sleep 5;
+    tar -xzf "$file" -C "$TMP_DIR"; sleep 5;
   #  echo $(find "$WORK_DIR" -type f -name "$name" -exec test -x {} \; -print);
   #} || { log "File not found: ${file}"; exit 1; }
 }
@@ -158,10 +158,10 @@ download() {
   #echo "$url";
   #url='https://github.com/shtorm-7/sing-box-extended/releases/download/v1.12.12-extended-1.4.2/sing-box-1.12.12-extended-1.4.2-linux-arm64.tar.gz';
   while (( count < retries )); do
-    [[ ! -f "${WORK_DIR}/${file}" ]] &&
+    [[ ! -f "${TMP_DIR}/${file}" ]] &&
       log "Downloading: ${file}" && {
         local pp;
-        curl "$url" -LJOs -o "${WORK_DIR}/${file}" --progress-bar 2>&1 |
+        curl "$url" -LJOs -o "${TMP_DIR}/${file}" --progress-bar 2>&1 |
         while IFS= read -d $'\r' -r p; do
           p=$(sed -E 's/(.* )([0-9]+.[0-9]+)(.*%)/\2/g' <<< $p);
           (( ${#p} )) && (( ${#p} < 6 )) && [[ "$p" =~ ^[0-9.]+$ ]] && {
@@ -175,12 +175,12 @@ download() {
         done;
       }
     sleep 1;
-    check_file "${WORK_DIR}/${file}" && {
+    check_file "${TMP_DIR}/${file}" && {
       log "File: ${file} downloaded and passed checks.";
       return 0;
     } || {
       log "File: ${file} failed check, retrying...";
-      rm -f "${WORK_DIR}/${file}";
+      rm -f "${TMP_DIR}/${file}";
       ((count++));
       sleep 5;
     }
@@ -195,11 +195,11 @@ get_file() {
     url file;
   url=$(get_url "$name");
   download "${url##*/}" "$url" && {
-    file=$(find "$WORK_DIR" -type f -name "${name}*");
+    file=$(find "$TMP_DIR" -type f -name "${name}*");
     #log "File path0: ${file}";
     #file=$(unpack_file "$file" "$name");
     unpack_file "$file" "$name";
-    file=$(find "$WORK_DIR" -type f -name "$name" -exec test -x {} \; -print);
+    file=$(find "$TMP_DIR" -type f -name "$name" -exec test -x {} \; -print);
   #  log "Downloading ${name} done.";
   #  log "File path: ${file}";
     copy_file "$file" "$name";
