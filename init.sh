@@ -347,9 +347,28 @@ configure_nftables() {
     cp "${WORK_DIR}/${file_nft_out}" "$config_path";
 }
 
+download_inbounds_config() {
+  log "Downloading inbounds config from $INBOUNDS_CONFIG_URL...";
+  curl -fsSL "$INBOUNDS_CONFIG_URL" -o "$LOCAL_INBOUNDS_CONFIG" || {
+    error "Failed to download inbounds config from $INBOUNDS_CONFIG_URL.";
+    exit 1;
+  }
+  log "Inbounds config downloaded successfully.";
+}
+
+download_extended_config() {
+  log "Downloading extended config from $INBOUNDS_CONFIG_URL...";
+  curl -fsSL "$INBOUNDS_CONFIG_URL" -o "$LOCAL_INBOUNDS_CONFIG" || {
+    error "Failed to download extended config from $INBOUNDS_CONFIG_URL.";
+    exit 1;
+  }
+  log "Extended config downloaded successfully.";
+}
+
 configure_sing_box() {
   local \
     config_path=$(uci -q get sing-box.main.conffile);
+
 
 }
 
