@@ -103,7 +103,7 @@ unpack_file() {
     name="$2";
   sleep 1;
   local dir=$(find "$WORK_DIR" -type d -name "${name}*");
-  [[ -d "$dir" ]] && rm -rf "$dir" && sleep 1;
+  [[ -d "$dir" ]] && rm -rf "$dir" && sleep 5;
   [[ -f "$file" ]] && {
     tar -xzf "$file" -C "$WORK_DIR"; sleep 5;
     echo $(find "$WORK_DIR" -type f -name "$name" -exec test -x {} \; -print);
