@@ -112,7 +112,7 @@ copy_file() {
     name="${2}" \
     dest=$(which "$name");
   log "Copy file: ${file} to: ${dest}";
-#  cp "$file" "$dest";
+  cp "$file" "$dest";
 }
 
 download() {
