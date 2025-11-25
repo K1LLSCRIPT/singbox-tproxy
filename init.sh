@@ -197,7 +197,7 @@ get_file() {
     name="$1" \
     url file;
   url=$(get_url "$name");
-  download "${url##*/}" "$url" && {
+  download "${url##*/}" "${url}" && {
     file=$(find "$WORK_DIR" -type f -name "${name}*");
     #log "File path0: ${file}";
     #file=$(unpack_file "$file" "$name");
