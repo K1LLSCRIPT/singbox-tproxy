@@ -1,6 +1,7 @@
 #!/bin/bash
 
 WORK_DIR="/root";
+GIT_DIR="${WORK_DIR}/git";
 CONFIG_FILE="config.sh";
 SCRIPT_NAME="$(basename $0)";
 SCRIPT_DIR="$(dirname "$(realpath "$0")")";
@@ -148,6 +149,12 @@ configure_sing_box_service() {
 }
 
 configure_dhcp() {
+  local \
+    init_dns="8.8.8.8" \
+    sing_dns="127.0.0.1#5353";
+
+  #echo "server=$sing_dns" > /etc/dnsmasq.servers;
+
   dhcp_params=(
     "dhcp.@dnsmasq[0].serversfile='/etc/dnsmasq.servers'"
     "dhcp.@dnsmasq[0].domainneeded='1'"
@@ -180,12 +187,96 @@ configure_dhcp() {
   #uci commit dhcp;
 }
 
+configure_network() {
+  [[ -z "$(uci -q get network.@rule[0])" ]] && {
+    log "Creating marking rule.";
+    uci batch <<EOI
+add network rule
+set network.@rule[0].mark='0x1'
+set network.@rule[0].priority='100'
+set network.@rule[0].lookup='100'
+EOI
+    uci commit network;
+  }
+
+  [[ -z "$(uci -q get network.@route[0])" ]] && {
+    log "Creating route rule.";
+    uci batch <<EOI
+add network route
+set network.@route[0].interface='loopback'
+set network.@route[0].target='0.0.0.0/0'
+set network.@route[0].table='100'
+set network.@route[0].type='local'
+EOI
+    uci commit network;
+  }
+}
+
+voicelist() {
+  local \
+    inp="${1}" \
+    beg="${2}" \
+    end="${3}";
+  [[ -f "${inp}" ]] && {
+    local \
+      ifst=$IFS \
+      list=($(cat "$inp"));
+    declare -a a;
+    for _l in ${!list[@]}; do
+      (($_l==((${#list[@]}-1)))) && end="";
+      a+=("${beg}${list[$_l]}${end}");
+    done
+    IFS=$'\n'; echo "${a[*]}"; IFS=$ifst;
+  }
+}
+
+make_nft_file() {
+  local \
+    inp="${1}" \
+    out="${2}";
+  [[ -f "${inp}" ]] && {
+    local reg="(.*)(\{\{)([a-zA-Z]+)(.*)(\}\})";
+    { while IFS= read -r line; do
+      [[ "${line}" =~ $reg ]] && {
+        local \
+          beg="${BASH_REMATCH[1]}" \
+          str="${BASH_REMATCH[3]}" \
+          end="${BASH_REMATCH[4]}";
+        typeset -f "$str" >/dev/null 2>&1 &&
+        "$str" "$FILE_VOICE" "${beg}" "${end}";
+      } || echo "${line}";
+    done < "${inp}"; } >> "${out}";
+  }
+}
+
+configure_nftables() {
+  local \
+    repo_voice="https://github.com/K1LLSCRIPT/rulesets" \
+    file_nft="tproxy.sh" \
+    file_nft_out="30-${file_nft%%.*}.nft" \
+    config_path="/etc/nftables.d/${file_nft_out}" \
+    file_voice;
+
+    log "Creating nftables config."
+
+    rm -rf "${GIT_DIR}/${repo_voice##*/}";
+    mkdir -p "${GIT_DIR}/${repo_voice##*/}";
+    git clone "$repo_voice" "${GIT_DIR}/${repo_voice##*/}";
+    file_voice="$(find ${GIT_DIR}/${repo_voice##*/} -name *.list)";
+    log "FILE VOICE: $file_voice";
+    echo -n > "${WORK_DIR}/${file_nft_out}";
+    make_nft_file "${WORK_DIR}/${file_nft}" "${WORK_DIR}/${file_nft_out}";
+    cp "${WORK_DIR}/${file_nft_out}" "$config_path";
+}
+
 main() {
   check_deps || { error "Failed to install packages"; exit 1; }
   check_user_args;
   (( $SINGBOX_EXTENDED )) && download;
 #  configure_sing_box_service;
-  configure_dhcp;
+#  configure_dhcp;
+#  configure_network;
+  configure_nftables;
 }
 
 main;
