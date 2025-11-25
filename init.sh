@@ -253,11 +253,13 @@ configure_nftables() {
   local \
     repo_voice="https://github.com/K1LLSCRIPT/rulesets" \
     file_nft="tproxy.sh" \
-    file_nft_out="30-${file_nft%%.*}.nft" \
-    config_path="/etc/nftables.d/${file_nft_out}" \
+    file_nft_out \
+    config_path \
     file_voice;
 
     log "Creating nftables config."
+    file_nft_out="30-${file_nft%%.*}.nft";
+    config_path="/etc/nftables.d/${file_nft_out}";
 
     rm -rf "${GIT_DIR}/${repo_voice##*/}";
     mkdir -p "${GIT_DIR}/${repo_voice##*/}";
