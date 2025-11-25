@@ -57,8 +57,8 @@ USER_ARGS=(
 
 check_input() {
   local \
-    inp="${1}" \
-    url="${2}" \
+    inp="$1" \
+    url="$2" \
     reg='^(https?)://[-[:alnum:]\+&@#/%?=~_|!:,.;]*[-[:alnum:]\+&@#/%=~_|]$';
 
     (( $url )) && { [[ "$inp" =~ $reg ]] && return 0; } ||
@@ -88,7 +88,7 @@ check_user_args(){
 
 get_url() {
   local tag url arh;
-  local name="${1}";
+  local name="$1";
   arh=$(uname -m );
   url="https://github.com/shtorm-7/sing-box-extended";
   [[ "$arh" =~ aarch64 ]] && arh="arm64";
@@ -113,8 +113,8 @@ unpack_file() {
 
 copy_file() {
   local \
-    file="${1}" \
-    name="${2}";
+    file="$1" \
+    name="$2";
   which "$name" >/dev/null || opkg install sing-box --force-reinstall;
   local dest=$(which "$name");
   [[ -f "$file" ]] && {
@@ -139,7 +139,7 @@ download_yy() {
 }
 
 check_file () {
-  local file="${1}";
+  local file="$1";
 
   [[ ! -s "$file" ]] && { log "FILE ${file##*/} error"; return 1; }
   [[ "$file" == *.gz ]] && {
@@ -190,7 +190,7 @@ download() {
 
 get_file() {
   local \
-    name="${1}" \
+    name="$1" \
     url file;
   url=$(get_url "$name");
   download "${url##*/}" "$url" && {
@@ -292,9 +292,9 @@ EOI
 
 voicelist() {
   local \
-    inp="${1}" \
-    beg="${2}" \
-    end="${3}";
+    inp="$1" \
+    beg="$2" \
+    end="$3";
   [[ -f "${inp}" ]] && {
     local \
       ifst=$IFS \
@@ -310,9 +310,9 @@ voicelist() {
 
 make_nft_file() {
   local \
-    inp="${1}" \
-    out="${2}" \
-    fvc="${3}";
+    inp="$1" \
+    out="$2" \
+    fvc="$3";
   [[ -f "${inp}" ]] && {
     local reg="(.*)(\{\{)([a-zA-Z]+)(.*)(\}\})";
     { while IFS= read -r line; do
