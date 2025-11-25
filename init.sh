@@ -209,16 +209,12 @@ get_file() {
     file=$(find "$WORK_DIR" -type f -name "${name}*");
     clean_dir "$name" "$WORK_DIR";
     file=$(unpack_file "$file" "$name");
-    #unpack_file "$file" "$name";
     file=$(find "$WORK_DIR" -type f -name "$name" -exec test -x {} \; -print);
     copy_file "$file" "$name";
     clean_dir "$name" "$WORK_DIR";
   } || { error "Get file: ${name} FAILED. Exiting."; exit 1; }
 }
 
-# https://github.com/shtorm-7/sing-box-extended/releases/download/v1.12.12-extended-1.4.2/sing-box-1.12.12-extended-1.4.2-linux-arm64.tar.gz
-# url="https://github.com/shtorm-7/sing-box-extended/releases/download/v1.12.12-extended-1.4.2/sing-box-1.12.12-extended-1.4.2-linux-arm64.tar.gz"; file="${url##*/}"; echo "$file"        
-# sing-box-1.12.12-extended-1.4.2-linux-arm64.tar.gz
 configure_sing_box_service() {
   local \
     enabled=$(uci -q get sing-box.main.enabled) \
@@ -242,7 +238,7 @@ configure_dhcp() {
     init_dns="8.8.8.8" \
     sing_dns="127.0.0.1#5353";
 
-  #echo "server=$sing_dns" > /etc/dnsmasq.servers;
+  echo "server=$sing_dns" > /etc/dnsmasq.servers;
 
   dhcp_params=(
     "dhcp.@dnsmasq[0].serversfile='/etc/dnsmasq.servers'"
@@ -270,10 +266,10 @@ configure_dhcp() {
   for (( i=0; i<$c; i++ )); do
     for p in "${dhcp_params[@]}"; do
       echo $(echo "$p" | sed -E "s/(.*)(\[.\])(.*)/\1\[${i}\]\3/");
-    #  uci -q set $(echo "$p" | sed -E "s/(.*)(\[.\])(.*)/\1\[${i}\]\3/");
+      uci -q set $(echo "$p" | sed -E "s/(.*)(\[.\])(.*)/\1\[${i}\]\3/");
     done
   done
-  #uci commit dhcp;
+  uci commit dhcp;
 }
 
 configure_network() {
@@ -355,10 +351,25 @@ configure_nftables() {
     mkdir -p "${GIT_DIR}/${repo_voice##*/}";
     git clone -q "$repo_voice" "${GIT_DIR}/${repo_voice##*/}";
     file_voice="$(find ${GIT_DIR}/${repo_voice##*/} -name *.list)";
-    log "FILE VOICE: $file_voice";
+
     echo -n > "${WORK_DIR}/${file_nft_out}";
     make_nft_file "${WORK_DIR}/${file_nft}" "${WORK_DIR}/${file_nft_out}" "$file_voice";
     cp "${WORK_DIR}/${file_nft_out}" "$config_path";
+}
+
+prog_control() {
+  local \
+    program="$1" \
+    command="$2";
+
+  (( $counter )) || { counter=0; }
+  [[ "$(service $program status)" =~ running  ]] && [[ "$command" == "start" ]] && counter=0 && return 0;
+  [[ "$(service $program status)" =~ inactive ]] && [[ "$command" == "stop"  ]] && counter=0 && return 0;
+  (( $counter > 10)) && echo  "$command $program failed" && return 1;
+  echo "attempt $((++counter)) $command $program";
+  "/etc/init.d/$program" "$command";
+  sleep 1;
+  prog_control "$program" "$command";
 }
 
 main() {
@@ -366,7 +377,7 @@ main() {
   check_deps || { error "Failed to install packages"; exit 1; }
   check_user_args;
   (( $SINGBOX_EXTENDED )) && get_file "sing-box";
-#  configure_sing_box_service;
+  configure_sing_box_service;
 #  configure_dhcp;
 #  configure_network;
   configure_nftables;
