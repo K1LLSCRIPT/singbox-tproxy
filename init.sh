@@ -231,32 +231,32 @@ configure_dhcp() {
   echo "server=$sing_dns" > /etc/dnsmasq.servers;
 
   dhcp_params=(
-    "dhcp.@dnsmasq[0].serversfile='/etc/dnsmasq.servers'"
-    "dhcp.@dnsmasq[0].domainneeded='1'"
-    "dhcp.@dnsmasq[0].localise_queries='1'"
-    "dhcp.@dnsmasq[0].rebind_protection='1'"
-    "dhcp.@dnsmasq[0].rebind_localhost='1'"
-    "dhcp.@dnsmasq[0].local='local'"
-    "dhcp.@dnsmasq[0].domain='local'"
-    "dhcp.@dnsmasq[0].expandhosts='1'"
-    "dhcp.@dnsmasq[0].cachesize='100'"
-    "dhcp.@dnsmasq[0].authoritative='1'"
-    "dhcp.@dnsmasq[0].readethers='1'"
-    "dhcp.@dnsmasq[0].leasefile='/tmp/dhcp.leases'"
-    "dhcp.@dnsmasq[0].localservice='1'"
-    "dhcp.@dnsmasq[0].ednspacket_max='1232'"
-    "dhcp.@dnsmasq[0].filter_aaaa='1'"
-    "dhcp.@dnsmasq[0].noresolv='1'"
+    "dhcp.@dnsmasq[0].serversfile=/etc/dnsmasq.servers"
+    "dhcp.@dnsmasq[0].domainneeded=1"
+    "dhcp.@dnsmasq[0].localise_queries=1"
+    "dhcp.@dnsmasq[0].rebind_protection=1"
+    "dhcp.@dnsmasq[0].rebind_localhost=1"
+    "dhcp.@dnsmasq[0].local=local"
+    "dhcp.@dnsmasq[0].domain=local"
+    "dhcp.@dnsmasq[0].expandhosts=1"
+    "dhcp.@dnsmasq[0].cachesize=100"
+    "dhcp.@dnsmasq[0].authoritative=1"
+    "dhcp.@dnsmasq[0].readethers=1"
+    "dhcp.@dnsmasq[0].leasefile=/tmp/dhcp.leases"
+    "dhcp.@dnsmasq[0].localservice=1"
+    "dhcp.@dnsmasq[0].ednspacket_max=1232"
+    "dhcp.@dnsmasq[0].filter_aaaa=1"
+    "dhcp.@dnsmasq[0].noresolv=1"
   );
 
   local c=$(uci show dhcp | grep "=dnsmasq" | wc -l);
 
   log "Configuring DHCP. Servers found: ${c}";
 
-  for (( i=0; i<$c; i++ )); do
+  local i p
+  for (( i=0; i<c; i++ )); do
     for p in "${dhcp_params[@]}"; do
-    #  echo $(echo "$p" | sed -E "s/(.*)(\[.\])(.*)/\1\[${i}\]\3/");
-      uci -q set $(echo "$p" | sed -E "s/(.*)(\[.\])(.*)/\1\[${i}\]\3/");
+      uci -q set "${p/\[0\]/[$i]}"
     done
   done
   uci commit dhcp;
