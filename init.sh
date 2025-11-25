@@ -12,6 +12,7 @@ source <(cat "${SCRIPT_DIR}/log.sh");
 
 [[ "$SCRIPT_DIR" != "$WORK_DIR" ]] && {
   echo; mkdir -p "$WORK_DIR";
+  log "Begin copying strapping files.";
   for f in $(find "$SCRIPT_DIR" -type f -name "*.sh"); do
     [[ "${f##*/}" == "config.sh" ]] &&
     [[ -f "${WORK_DIR}/${CONFIG_FILE}" ]] ||
