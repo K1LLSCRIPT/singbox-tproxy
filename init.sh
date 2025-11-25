@@ -167,13 +167,16 @@ configure_dhcp() {
     "dhcp.@dnsmasq[0].noresolv='1'"
   );
 
-  for p in "${dhcp_params[@]}"; do
-    echo "dhcp_param: ${p}";
+  local c=$(uci show dhcp | grep "=dnsmasq" | wc -l);
+##  ((c--));
+  log "s_count: ${c}"
+
+  for (( i=0; i<$c; i++ )); do
+    for p in "${dhcp_params[@]}"; do
+      echo "dhcp_param ${c}: ${p}";
+    done
   done
 
-  local s_count=$(uci show dhcp | grep "=dnsmasq" | wc -l);
-  ((s_count--));
-  log "s_count: ${s_count}"
 }
 
 main() {
