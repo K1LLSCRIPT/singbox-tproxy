@@ -129,10 +129,55 @@ download() {
   copy_file "$file" "$name";
 }
 
+configure_sing_box_service() {
+  local \
+    enabled=$(uci -q get sing-box.main.enabled) \
+    user=$(uci -q get sing-box.main.user);
+
+  (( "$sing_box_enabled" )) || {
+    log "Enabling sing-box service";
+    uci -q set sing-box.main.enabled=1;
+    uci commit sing-box;
+  }
+
+  [[ "$sing_box_user" != "root" ]] && {
+    log "Setting sing-box user to root";
+    uci -q set sing-box.main.user=root;
+    uci commit sing-box;
+  }
+}
+
+configure_dhcp() {
+  dhcp_params=(
+    "dhcp.@dnsmasq[0].serversfile='/etc/dnsmasq.servers'"
+    "dhcp.@dnsmasq[0].domainneeded='1'"
+    "dhcp.@dnsmasq[0].localise_queries='1'"
+    "dhcp.@dnsmasq[0].rebind_protection='1'"
+    "dhcp.@dnsmasq[0].rebind_localhost='1'"
+    "dhcp.@dnsmasq[0].local='local'"
+    "dhcp.@dnsmasq[0].domain='local'"
+    "dhcp.@dnsmasq[0].expandhosts='1'"
+    "dhcp.@dnsmasq[0].cachesize='100'"
+    "dhcp.@dnsmasq[0].authoritative='1'"
+    "dhcp.@dnsmasq[0].readethers='1'"
+    "dhcp.@dnsmasq[0].leasefile='/tmp/dhcp.leases'"
+    "dhcp.@dnsmasq[0].localservice='1'"
+    "dhcp.@dnsmasq[0].ednspacket_max='1232'"
+    "dhcp.@dnsmasq[0].filter_aaaa='1'"
+    "dhcp.@dnsmasq[0].noresolv='1'"
+  );
+
+  for p in "${dhcp_params[@]}"; do
+    echo "dhcp_param: ${p}";
+  done
+}
+
 main() {
   check_deps || { error "Failed to install packages"; exit 1; }
   check_user_args;
   (( $SINGBOX_EXTENDED )) && download;
+#  configure_sing_box_service;
+  configure_dhcp;
 }
 
 main;
