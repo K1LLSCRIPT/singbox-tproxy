@@ -35,12 +35,16 @@ USER_ARGS=(
 
 check_user_args(){
   for a in "${USER_ARGS[@]}"; do
-    (( ${#a} )) || {
-      read -p "Please provide ${a}: " $v;
-      sed -i -E "s/(${a})(.*)/\1=\'${v}\'/" "${WORK_DIR}/${CONFIG_FILE}";
-    }
+    local s=$(cat "${WORK_DIR}/${CONFIG_FILE}" | grep "$a" | head -n 1);
+    $a || echo "need"
+#    (( ${#a} )) || {
+#      read -p "Please provide ${a}: " $v;
+#      sed -i -E "s/(${a})(.*)/\1=\'${v}\'/" "${WORK_DIR}/${CONFIG_FILE}";
+#    }
   done
   [[ ! -z "$v" ]] && source <(cat "${SCRIPT_DIR}/${CONFIG_FILE}") || log "all args are set.";
 }
 
 check_user_args;
+
+# v="SUBSCRIPTION_URL"; s=$(cat /root/singbox-tproxy/config.sh | grep "$v" | head -n 1 | sed -E "s/(${v})(.*)/\1/"); echo "$s"
