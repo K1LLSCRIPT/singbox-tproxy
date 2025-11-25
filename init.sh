@@ -10,22 +10,42 @@ source <(cat "${SCRIPT_DIR}/${CONFIG_FILE}");
 source <(cat "${SCRIPT_DIR}/log.sh");
 
 [[ "$SCRIPT_DIR" != "$WORK_DIR" ]] && {
-  log "SCRIPT_DIR: ${SCRIPT_DIR}";
-  log "WORK_DIR: ${WORK_DIR}";
-  log "copy files";
   mkdir -p "$WORK_DIR";
   for f in $(find "$SCRIPT_DIR" -type f -name "*.sh"); do
     [[ "${f##*/}" == "config.sh" ]] &&
     [[ -f "${WORK_DIR}/${CONFIG_FILE}" ]] ||
-    cp "$f" "$WORK_DIR";
+    { cp "$f" "$WORK_DIR"; log "Copy file: ${f} to: ${WORK_DIR}";
   done
   exec "${WORK_DIR}/init.sh" "$@";
 }
 
-echo;
-log "running";
-log "SCRIPT_DIR: ${SCRIPT_DIR}";
-log "WORK_DIR: ${WORK_DIR}";
+prepare() {
+  rm -rf "$TMP_DIR";
+  mkdir -p "$TMP_DIR";
+}
+
+deps=(
+  sing-box
+  kmod-nft-tproxy
+  git-http
+  wget
+  curl
+  jq
+);
+
+check_deps() {
+  local nopkg=();
+  for pkg in "${deps[@]}"; do
+    [[ ! -x "$(command -v $pkg)" ]] && nopkg+=("${pkg}");
+  done;
+  (( "${#nopkg[@]}" )) && {
+    log "Updating package list.";
+    opkg update >/dev/null || return 1;
+    log "Installing packages: ${nopkg[@]}";
+    opkg install "${nopkg[@]}" || return 1;
+  }
+  return 0;
+}
 
 USER_ARGS=(
   SUBSCRIPTION_URL
@@ -45,6 +65,7 @@ check_input() {
 }
 
 check_user_args(){
+  echo; log "Checking user settings.";
   for a in "${USER_ARGS[@]}"; do
     local s u e;
     s=$(cat "${WORK_DIR}/${CONFIG_FILE}" | grep "$a" | head -n 1 | sed -E "s/(${a})(.*)/\2/" | sed -E 's/["'\''=;]//g');
@@ -63,11 +84,6 @@ check_user_args(){
   done
 }
 
-check_user_args;
-
-rm -rf "$TMP_DIR";
-mkdir -p "$TMP_DIR";
-
 get_url() {
   local url="https://github.com/shtorm-7/sing-box-extended";
   local arh=$(uname -m );
@@ -75,6 +91,7 @@ get_url() {
   [[ "$arh" =~ aarch64 ]] && arh="arm64";
   tag=$(git ls-remote --tags "${url}.git" | awk -F/ '{print $3}' | grep -E '^v[0-9]+' | sort -V | tail -n1);
   url="${url}/releases/download/${tag}/${tag/v/sing-box-}-linux-${arh}.tar.gz";
+  log "Found URL: ${url}";
   echo "$url";
 }
 
@@ -86,6 +103,7 @@ unpack_file() {
   #  mkdir -p "${TMP_DIR}/${name}";
   #  tar -xzf "$file" -C "${TMP_DIR}/${name}";
     tar -xzf "$file" -C "${TMP_DIR}";
+    echo $(find $TMP_DIR -type f -name ${name}* -exec test -x {} \; -print);
   }
 }
 
@@ -94,10 +112,18 @@ download() {
     file \
     name="sing-box" \
     url=$(get_url);
+  log "Downloading ${name}...";
   curl -LJOs --output-dir "$TMP_DIR" "$url";
-  file=$(find $TMP_DIR -type f -name sing*);
-  unpack_file "$file" "$name";
+  file=$(find $TMP_DIR -type f -name ${name}*);
+  file=$(unpack_file "$file" "$name");
+  log "Downloading ${name} done.";
+  log "File path: ${file}";
 }
 
-(( $SINGBOX_EXTENDED )) && download
+main() {
+  check_deps || { error "Failed to install packages"; exit 1; }
+  check_user_args;
+  (( $SINGBOX_EXTENDED )) && download;
+}
 
+main;
