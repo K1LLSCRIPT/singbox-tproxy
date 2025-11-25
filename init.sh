@@ -403,6 +403,14 @@ prog_control() {
   prog_control "$program" "$command";
 }
 
+restart_service(){
+  local \
+    program="$1";
+  log "Restarting $program service."
+  prog_control "$program" stop;
+  prog_control "$program" start;
+}
+
 main() {
   prepare;
   check_deps || { error "Failed to install packages"; exit 1; }
@@ -412,6 +420,9 @@ main() {
   configure_dhcp;
   configure_network;
   configure_nftables;
+  restart_service "network"
+  restart_service "dnsmasq"
+  restart_service "firewall"
 }
 
 main;
