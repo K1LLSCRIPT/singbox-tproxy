@@ -105,7 +105,7 @@ unpack_file() {
   [[ -f "$file" ]] && {
     local dir=$(find "$WORK_DIR" -type d -name "${name}*");
     [[ -z "$dir" ]] && [[ -d "$dir" ]] && rm -rf "$dir";
-    tar -xzf "$file" -C "${WORK_DIR}";
+    tar -xzf "$file" -C "$WORK_DIR";
     echo $(find "$WORK_DIR" -type f -name "${name}" -exec test -x {} \; -print);
   }
 }
@@ -194,6 +194,7 @@ get_file() {
   url=$(get_url "$name");
   download "${url##*/}" "$url" && {
     file=$(find "$WORK_DIR" -type f -name "${name}*");
+    log "File path0: ${file}";
     file=$(unpack_file "$file" "$name");
     log "Downloading ${name} done.";
     log "File path: ${file}";
