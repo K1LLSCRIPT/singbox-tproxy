@@ -116,10 +116,10 @@ copy_file() {
 }
 
 download() {
-  local \
-    file \
-    name="sing-box" \
-    url=$(get_url);
+  local  url  file \
+    name="sing-box";
+  url=$(get_url);
+  log "url: ${url}";
   log "Downloading ${name}...";
   curl -LJOs --output-dir "$TMP_DIR" "$url";
   file=$(find $TMP_DIR -type f -name ${name}*);
