@@ -233,7 +233,8 @@ voicelist() {
 make_nft_file() {
   local \
     inp="${1}" \
-    out="${2}";
+    out="${2}" \
+    fvc="${3}";
   [[ -f "${inp}" ]] && {
     local reg="(.*)(\{\{)([a-zA-Z]+)(.*)(\}\})";
     { while IFS= read -r line; do
@@ -243,7 +244,7 @@ make_nft_file() {
           str="${BASH_REMATCH[3]}" \
           end="${BASH_REMATCH[4]}";
         typeset -f "$str" >/dev/null 2>&1 &&
-        "$str" "$FILE_VOICE" "${beg}" "${end}";
+        "$str" "$fvc" "${beg}" "${end}";
       } || echo "${line}";
     done < "${inp}"; } >> "${out}";
   }
@@ -267,7 +268,7 @@ configure_nftables() {
     file_voice="$(find ${GIT_DIR}/${repo_voice##*/} -name *.list)";
     log "FILE VOICE: $file_voice";
     echo -n > "${WORK_DIR}/${file_nft_out}";
-    make_nft_file "${WORK_DIR}/${file_nft}" "${WORK_DIR}/${file_nft_out}";
+    make_nft_file "${WORK_DIR}/${file_nft}" "${WORK_DIR}/${file_nft_out}" "$file_voice";
     cp "${WORK_DIR}/${file_nft_out}" "$config_path";
 }
 
