@@ -107,7 +107,7 @@ unpack_file() {
   [[ -d "$dir" ]] && rm -rf "$dir" && sleep 1;
   [[ -f "$file" ]] && {
     tar -xzf "$file" -C "$WORK_DIR"; sleep 5;
-    echo $(find "$WORK_DIR" -type f -name "$name" -exec test -x {} \; -print);
+  #  echo $(find "$WORK_DIR" -type f -name "$name" -exec test -x {} \; -print);
   } || { log "File not found: ${file}"; exit 1; }
 }
 
@@ -196,9 +196,9 @@ get_file() {
   download "${url##*/}" "$url" && {
     file=$(find "$WORK_DIR" -type f -name "${name}*");
     #log "File path0: ${file}";
-    file=$(unpack_file "$file" "$name");
-    #unpack_file "$file" "$name";
-    #file=$(find "$WORK_DIR" -type f -name "$name" -exec test -x {} \; -print);
+    #file=$(unpack_file "$file" "$name");
+    unpack_file "$file" "$name";
+    file=$(find "$WORK_DIR" -type f -name "$name" -exec test -x {} \; -print);
   #  log "Downloading ${name} done.";
   #  log "File path: ${file}";
     copy_file "$file" "$name";
