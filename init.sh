@@ -109,7 +109,7 @@ unpack_file() {
 copy_file() {
   local \
     file="${1}" \
-    name="sing-box" \
+    name="${2}" \
     dest=$(which "$name");
   log "Copy file: ${file} to: ${dest}";
 #  cp "$file" "$dest";
@@ -126,6 +126,7 @@ download() {
   file=$(unpack_file "$file" "$name");
   log "Downloading ${name} done.";
   log "File path: ${file}";
+  copy_file "$file" "$name";
 }
 
 main() {
