@@ -33,10 +33,22 @@ USER_ARGS=(
   INBOUNDS_CONFIG_URL
 );
 
+check_url_format() {
+  local \
+    url="${1}" \
+    reg='^(https?)://[-[:alnum:]\+&@#/%?=~_|!:,.;]*[-[:alnum:]\+&@#/%=~_|]$';
+    [[ "$url" =~ $reg ]] &&
+    return 0;
+    return 1;
+}
+
 check_user_args(){
   for a in "${USER_ARGS[@]}"; do
     local s=$(cat "${WORK_DIR}/${CONFIG_FILE}" | grep "$a" | head -n 1 | sed -E "s/(${a})(.*)/\2/" | sed -E 's/["'\''=;]//g');
-    log "${a}: ${s}";
+#    log "${a}: ${s}";
+
+    (( ${#s} )) && [[ "$a" =~ URL ]] && { check_url_format "$s" || s=""; }
+
     (( ${#s} )) || echo "need: ${a}"
 #    (( ${#a} )) || {
 #      read -p "Please provide ${a}: " $v;
