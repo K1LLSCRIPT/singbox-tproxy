@@ -102,8 +102,6 @@ unpack_file() {
     file="$1" \
     name="$2";
   sleep 1;
-  local dir=$(find "$WORK_DIR" -type d -name "${name}*");
-  [[ -d "$dir" ]] && rm -rf "$dir" && sleep 5;
   [[ -f "$file" ]] && {
     tar -xzf "$file" -C "$WORK_DIR"; sleep 5;
     echo $(find "$WORK_DIR" -type f -name "$name" -exec test -x {} \; -print);
@@ -114,7 +112,10 @@ copy_file() {
   local \
     file="$1" \
     name="$2";
-  which "$name" >/dev/null || opkg install sing-box --force-reinstall;
+  which "$name" >/dev/null || {
+    opkg update >/dev/null;
+    opkg install "$name" --force-reinstall;
+  }
   local dest=$(which "$name");
   [[ -f "$file" ]] && {
     log "Copy file: ${file} to: ${dest}";
@@ -133,7 +134,6 @@ download_yy() {
   file=$(find "$WORK_DIR" -type f -name "${name}*");
   file=$(unpack_file "$file" "$name");
   log "Downloading ${name} done.";
-  log "File path: ${file}";
   copy_file "$file" "$name";
 }
 
@@ -162,7 +162,7 @@ download() {
     [[ ! -f "$file" ]] &&
       log "Downloading: ${file}" && {
         local pp;
-        curl "$url" -L -o "$file" --progress-bar 2>&1 |
+        curl "$url" -LJOs -o "$file" --progress-bar 2>&1 |
         while IFS= read -d $'\r' -r p; do
           p=$(sed -E 's/(.* )([0-9]+.[0-9]+)(.*%)/\2/g' <<< $p);
           (( ${#p} )) && (( ${#p} < 6 )) && [[ "$p" =~ ^[0-9.]+$ ]] && {
@@ -190,20 +190,32 @@ download() {
   return 1;
 }
 
+clean_dir() {
+  local \
+    name="$1" \
+    cdir="$2" \
+    dir;
+  dir=$(find "$cdir" -type d -name "${name}*");
+  [[ -d "$dir" ]] && rm -rf "$dir" && sleep 5;
+  return 0;
+}
+
 get_file() {
   local \
     name="$1" \
-    url file;
+    url file dir;
   url=$(get_url "$name");
   download "${url##*/}" "${url}" && {
     file=$(find "$WORK_DIR" -type f -name "${name}*");
     #log "File path0: ${file}";
     #file=$(unpack_file "$file" "$name");
+    clean_dir "$name" "$WORK_DIR";
     unpack_file "$file" "$name";
     file=$(find "$WORK_DIR" -type f -name "$name" -exec test -x {} \; -print);
   #  log "Downloading ${name} done.";
   #  log "File path: ${file}";
     copy_file "$file" "$name";
+    clean_dir "$name" "$WORK_DIR";
   } || { error "Get file: ${name} FAILED. Exiting."; exit 1; }
 }
 
