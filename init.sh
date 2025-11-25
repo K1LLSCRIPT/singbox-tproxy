@@ -48,10 +48,12 @@ check_user_args(){
 
     (( ${#s} )) && [[ "$a" =~ URL ]] && { check_url_format "$s" || s=""; }
     (( ${#s} )) || {
+      v=$(printf '%s' "Please provide ${a}: " >&2; read x && printf '%s' "$x")
+      
 #      while read -r line && [ "$1" != 1 ]
-      while read -p "Please provide ${a}: " $v && check_url_format $v;
+#      while read -p "Please provide ${a}: " v && check_url_format "$v";
 #      read -p "Please provide ${a}: " $v;
-      sed -i -E "s/(${a})(.*)/\1=\'${v}\'/" "${WORK_DIR}/${CONFIG_FILE}";
+#      sed -i -E "s/(${a})(.*)/\1=\'${v}\'/" "${WORK_DIR}/${CONFIG_FILE}";
     }
   done
 #  [[ ! -z "$v" ]] && source <(cat "${SCRIPT_DIR}/${CONFIG_FILE}") || log "all args are set.";
