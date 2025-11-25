@@ -160,7 +160,7 @@ url="https://github.com/shtorm-7/sing-box-extended/releases/download/v1.12.12-ex
         local pp;
         curl "$url" -L -o "${WORK_DIR}/${file}" --progress-bar 2>&1 |
         while IFS= read -d $'\r' -r p; do
-          p=$(${CMD[sed]} -E 's/(.* )([0-9]+.[0-9]+)(.*%)/\2/g' <<< $p);
+          p=$(sed -E 's/(.* )([0-9]+.[0-9]+)(.*%)/\2/g' <<< $p);
           (( ${#p} )) && (( ${#p} < 6 )) && [[ "$p" =~ ^[0-9.]+$ ]] && {
             p=$(bc <<< "($p+0.5)/1");
             (( p != pp )) && {
