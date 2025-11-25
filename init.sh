@@ -103,11 +103,12 @@ unpack_file() {
     file="$1" \
     name="$2";
 
+  [[ -d "$dir" ]] &&  log  "zaeblo";
   [[ -f "$file" ]] && {
     local dir=$(find "$WORK_DIR" -type d -name "${name}*");
     #[[ -d "$dir" ]] && 
         log  "zaeblo";
-    rm -rf "${dir}";
+    #rm -rf "${dir}";
     tar -xzf "$file" -C "$WORK_DIR";
     local bin=$(find "$WORK_DIR" -type f -name "$name" -exec test -x {} \; -print);
     echo "$bin";
