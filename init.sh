@@ -85,9 +85,10 @@ check_user_args(){
 }
 
 get_url() {
-  local url="https://github.com/shtorm-7/sing-box-extended";
-  local arh=$(uname -m );
-  local tag;
+  local \
+    tag \
+    url="https://github.com/shtorm-7/sing-box-extended";
+    arh=$(uname -m );
   [[ "$arh" =~ aarch64 ]] && arh="arm64";
   tag=$(git ls-remote --tags "${url}.git" | awk -F/ '{print $3}' | grep -E '^v[0-9]+' | sort -V | tail -n1);
   url="${url}/releases/download/${tag}/${tag/v/sing-box-}-linux-${arh}.tar.gz";
@@ -103,6 +104,15 @@ unpack_file() {
     tar -xzf "$file" -C "${TMP_DIR}";
     echo $(find $TMP_DIR -type f -name ${name} -exec test -x {} \; -print);
   }
+}
+
+copy_file() {
+  local \
+    file="${1}" \
+    name="sing-box" \
+    dest=$(which "$name");
+  log "Copy file: ${file} to: ${dest}";
+#  cp "$file" "$dest";
 }
 
 download() {
