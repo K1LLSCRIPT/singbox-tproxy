@@ -31,6 +31,7 @@ deps=(
   git-http
   curl
   jq
+  bc
 );
 
 check_deps() {
@@ -87,11 +88,12 @@ check_user_args(){
 
 get_url() {
   local tag url arh;
+  local name="${1}";
   arh=$(uname -m );
   url="https://github.com/shtorm-7/sing-box-extended";
   [[ "$arh" =~ aarch64 ]] && arh="arm64";
   tag=$(git ls-remote --tags "${url}.git" | awk -F/ '{print $3}' | grep -E '^v[0-9]+' | sort -V | tail -n1);
-  url="${url}/releases/download/${tag}/${tag/v/sing-box-}-linux-${arh}.tar.gz";
+  url="${url}/releases/download/${tag}/${tag/v/${name}-}-linux-${arh}.tar.gz";
   log "Found URL: ${url}";
   echo "$url";
 }
@@ -119,7 +121,7 @@ copy_file() {
   } || { log "Copy file: ${name} FAILED"; exit 1; }
 }
 
-download() {
+download_yy() {
   local  url  file \
     name="sing-box";
   url=$(get_url);
@@ -133,6 +135,71 @@ download() {
   log "File path: ${file}";
   copy_file "$file" "$name";
 }
+
+check_file () {
+  local file="${1}";
+
+  [[ ! -s "$file" ]] && { log "FILE ${file##*/} error"; return 1; }
+  [[ "$file" == *.gz ]] && {
+    gzip -t "$file" 2>/dev/null ||
+    { log "FILE ${file##*/} is fucked .gz"; return 1; }
+  }
+  return 0;
+}
+
+download() {
+  local \
+    file="${1}" \
+    url="${2}" \
+    retries=10 \
+    count=0;
+
+  while (( count < retries )); do
+    [[ ! -f "${WORK_DIR}/${file}" ]] &&
+      log "Downloading: ${file}" && {
+        local pp;
+        curl "$url" -L -o "${WORK_DIR}/${file}" --progress-bar 2>&1 |
+        while IFS= read -d $'\r' -r p; do
+          p=$(${CMD[sed]} -E 's/(.* )([0-9]+.[0-9]+)(.*%)/\2/g' <<< $p);
+          (( ${#p} )) && (( ${#p} < 6 )) && [[ "$p" =~ ^[0-9.]+$ ]] && {
+            p=$(bc <<< "($p+0.5)/1");
+            (( p != pp )) && {
+              pp=$p;
+              echo -ne "[ $p% ] [ $(eval 'printf =%.0s {1..'${p}'}')> ]\r";
+              (( p == 100 )) && echo;
+            }
+          }
+        done;
+      }
+
+    check_file "${WORK_DIR}/${file}" && {
+      log "File: ${file} downloaded and passed checks.";
+      return 0;
+    } || {
+      log "File: ${file} failed check, retrying...";
+      rm -f "$WORK_DIR/${file}";
+      ((count++));
+      sleep 5;
+    }
+  done;
+  log "Failed to download ${file} after ${retries} attempts";
+  return 1;
+}
+
+get_file() {
+  local \
+    name="${1}" \
+    url file;
+  url=$(get_url "$name");
+  download "${url##*/}" "$url" && {
+    file=$(find "$WORK_DIR" -type f -name "${name}*");
+    file=$(unpack_file "$file" "$name");
+    log "Downloading ${name} done.";
+    log "File path: ${file}";
+    copy_file "$file" "$name";
+  } || { log "Get file: ${name} FAILED. Exiting."; exit 1; }
+}
+
 # https://github.com/shtorm-7/sing-box-extended/releases/download/v1.12.12-extended-1.4.2/sing-box-1.12.12-extended-1.4.2-linux-arm64.tar.gz
 # url="https://github.com/shtorm-7/sing-box-extended/releases/download/v1.12.12-extended-1.4.2/sing-box-1.12.12-extended-1.4.2-linux-arm64.tar.gz"; file="${url##*/}"; echo "$file"        
 # sing-box-1.12.12-extended-1.4.2-linux-arm64.tar.gz
@@ -282,7 +349,7 @@ main() {
   prepare;
   check_deps || { error "Failed to install packages"; exit 1; }
   check_user_args;
-  (( $SINGBOX_EXTENDED )) && download;
+  (( $SINGBOX_EXTENDED )) && get_file "sing-box";
 #  configure_sing_box_service;
 #  configure_dhcp;
 #  configure_network;
