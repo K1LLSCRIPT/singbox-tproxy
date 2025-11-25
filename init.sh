@@ -62,7 +62,7 @@ check_user_args(){
     }
   done
 #  [[ ! -z "$v" ]] && source <(cat "${SCRIPT_DIR}/${CONFIG_FILE}") || log "all args are set.";
-}
+
 
 check_user_args;
 # v="SUBSCRIPTION_URL"; s=$(cat /root/singbox-tproxy/config.sh | grep "$v" | head -n 1 | sed -E "s/(${v})(.*)/\2/" | sed -E 's/["'\''=;]//g'); echo "$s"
