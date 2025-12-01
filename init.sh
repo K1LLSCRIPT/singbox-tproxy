@@ -425,7 +425,7 @@ prog_control() {
   [[ "$(service $program status)" =~ running  ]] && [[ "$command" == "start" ]] && counter=0 && return 0;
   [[ "$(service $program status)" =~ inactive ]] && [[ "$command" == "stop"  ]] && counter=0 && return 0;
   (( $counter > 10)) && echo  "$command $program failed" && return 1;
-  log "$command $program service (attempt $((++counter)).)";
+  log "$command $program service (attempt $((++counter))).";
   "/etc/init.d/$program" "$command";
   sleep 1;
   prog_control "$program" "$command";
