@@ -31,13 +31,17 @@ deps=(
   sing-box
   kmod-nft-tproxy
   git-http
+  jq-full
   curl
-  jq
   bc
 );
 
 check_deps() {
   local nopkg=();
+  opkg list-installed | grep -Eqo "^jq" && {
+    opkg list-installed | grep -Eqo "^jq-full" ||
+    opkg remove jq;
+  }
   for pkg in "${deps[@]}"; do
     opkg list-installed | grep -Eqo "^${pkg}" || nopkg+=("${pkg}");
   #  [[ ! -x "$(command -v $pkg)" ]] && nopkg+=("${pkg}");
@@ -93,13 +97,30 @@ check_user_args(){
 }
 
 get_url() {
-  local tag url arh;
-  local name="$1";
-  arh=$(uname -m );
+  local \
+    name="$1" \
+    arh=$(uname -m) \
+    tag url; 
+
   url="https://github.com/shtorm-7/sing-box-extended";
-  [[ "$arh" =~ aarch64 ]] && arh="arm64";
-  tag=$(git ls-remote --tags "${url}.git" | awk -F/ '{print $3}' | grep -E '^v[0-9]+' | sort -V | tail -n1);
-  url="${url}/releases/download/${tag}/${tag/v/${name}-}-linux-${arh}.tar.gz";
+
+  [[ "arm64|aarch64" =~ "$arh" ]] && arh="arm64|aarch64";
+
+  tag=$(
+    git ls-remote --tags "${url}.git" \
+      | awk -F/ '{print $3}' \
+      | grep -E '^v[0-9]+' \
+      | sort -V \
+      | tail -n1
+  );
+
+  url=$(
+    jq -r --arg reg "linux.*$arh" '.assets[]
+      | .browser_download_url
+      | select(test($reg))
+    ' <<< "$(curl -Ls ${url/github.com/api.github.com/repos}/releases/tags/${tag})"
+  );
+
   echo "$url";
 }
 
@@ -193,8 +214,19 @@ clean_dir() {
 get_file() {
   local \
     name="$1" \
-    url file dir;
+    url file dir ver;
+
   url=$(get_url "$name");
+
+  which "$name" >/dev/null &&
+  ver="$($name version | head -n 1)";
+
+  ((${#ver})) && ver="${ver/$name version /}";
+  ((${#ver})) && [[ "$url" =~ "$ver" ]] && {
+    log "Latest ${name} version installed: ${ver}";
+    return 0;
+  }
+  
   download "${url##*/}" "${url}" && {
     file=$(find "$WORK_DIR" -type f -name "${name}*");
     clean_dir "$name" "$WORK_DIR";
