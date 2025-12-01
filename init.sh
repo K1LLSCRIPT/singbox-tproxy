@@ -365,10 +365,10 @@ configure_nftables() {
 }
 
 configure_sing_box() {
-  local \
+  local url \
     config_path=$(uci -q get sing-box.main.conffile);
   log "Configuring sing-box";
-  local url='https://zbs.ninja/ibyfsk7c2dat/sing/noredir/config.json';
+  (( $SINGBOX_EXTENDED )) && url="$EXTENDED_TEMPLATE_URL";
   local backup_dir="${WORK_DIR}/backup/$(date +"%Y-%m-%d-%H-%M-%S")";
   mkdir -p "$backup_dir";
   curl "$url" -Ls -o "${TMP_DIR}/config.json" 2>&1;
