@@ -231,6 +231,7 @@ configure_dhcp() {
   list_servers=(
     "pool.ntp.org"
     "dynamo.vision"
+    "beardman.trade"
     "darkvpn.net"
     "darkvpn.app"
     "zbs.ninja"
@@ -269,7 +270,7 @@ configure_dhcp() {
 
   log "Configuring DHCP. Servers found: ${c}";
 
-  local i p
+  local i p;
   for (( i=0; i<c; i++ )); do
     for p in "${dhcp_params[@]}"; do
       uci -q set "${p/\[0\]/[$i]}"
