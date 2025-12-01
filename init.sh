@@ -226,7 +226,7 @@ get_file() {
     log "Latest ${name} version installed: ${ver}";
     return 0;
   }
-  
+
   download "${url##*/}" "${url}" && {
     file=$(find "$WORK_DIR" -type f -name "${name}*");
     clean_dir "$name" "$WORK_DIR";
@@ -242,13 +242,13 @@ configure_sing_box_service() {
     enabled=$(uci -q get sing-box.main.enabled) \
     user=$(uci -q get sing-box.main.user);
 
-  (( "$sing_box_enabled" )) || {
+  (( "$enabled" )) || {
     log "Enabling sing-box service";
     uci -q set sing-box.main.enabled=1;
     uci commit sing-box;
   }
 
-  [[ "$sing_box_user" != "root" ]] && {
+  [[ "$user" != "root" ]] && {
     log "Setting sing-box user to root";
     uci -q set sing-box.main.user=root;
     uci commit sing-box;
