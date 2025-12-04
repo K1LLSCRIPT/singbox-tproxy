@@ -257,7 +257,7 @@ configure_sing_box_service() {
 
 configure_dhcp() {
   local \
-    init_dns="8.8.8.8" \
+    init_dns="9.9.9.9" \
     sing_dns="127.0.0.1#5353";
 
   list_servers=(
