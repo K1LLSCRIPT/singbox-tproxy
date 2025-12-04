@@ -24,7 +24,7 @@ control() {
   local \
     command="$1" \
     sing_dns='127.0.0.1#5353' \
-    direct_dns='9.9.9.9' \
+    direct_dns='8.8.8.8' \
     nft_file="/etc/nftables.d/30-tproxy.nft" \
     work_dir="/root/singbox-tproxy";
 
